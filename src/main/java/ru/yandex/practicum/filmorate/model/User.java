@@ -1,29 +1,37 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
-@AllArgsConstructor
 public class User {
 
     Integer id;
+
+    @NotNull
     @Pattern(regexp = "(\\w)+", message = "Логин не дожен быть пустым и содержать пробелы или спецсимволы")
     String login;
+
+    @NotNull
     String name;
+
+    @NotBlank
     @Email
     String email;
+
     @Past
     LocalDate birthday;
 
-    public void checkName() {
-        if (this.getName() == null || this.getName().isBlank()) {
-            this.setName(this.getLogin());
+    public User(Integer id, String login, String name, String email, LocalDate birthday) {
+        this.id = id;
+        this.login = login;
+        this.name = name;
+        this.email = email;
+        this.birthday = birthday;
+        if (this.name == null || this.name.isBlank()) {
+            this.name = this.login;
         }
     }
 

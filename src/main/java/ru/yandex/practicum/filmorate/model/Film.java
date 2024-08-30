@@ -44,7 +44,7 @@ public class Film {
             message = "Название фильма не заполнено";
         } else if (this.getDescription().length() > 200) {
             message = "Слишком длинное описание фильма";
-        } else if (this.duration <= 0 ) {
+        } else if (this.duration <= 0) {
             message = "Длительность фильма должна быть положительным числом";
         }
         if (!message.isBlank()) {

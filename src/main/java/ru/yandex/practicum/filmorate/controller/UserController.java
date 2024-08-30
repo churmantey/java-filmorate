@@ -27,7 +27,6 @@ public class UserController {
     public User create(@Valid @RequestBody User user) {
         log.debug("POST user {}", user);
         user.setId(getNextId());
-        user.checkName();
         users.put(user.getId(), user);
         return user;
     }
@@ -36,7 +35,6 @@ public class UserController {
     public User update(@Valid @RequestBody User newUser) {
         log.debug("PUT user {}", newUser);
         if (users.containsKey(newUser.getId())) {
-            newUser.checkName();
             User oldUser = users.get(newUser.getId());
             oldUser.setLogin(newUser.getLogin());
             oldUser.setName(newUser.getName());
