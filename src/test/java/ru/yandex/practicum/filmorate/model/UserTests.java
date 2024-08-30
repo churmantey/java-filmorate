@@ -26,6 +26,7 @@ public class UserTests {
         assertEquals("Логин не дожен быть пустым и содержать пробелы или спецсимволы",
                 violations.stream().findFirst().get().getMessage());
     }
+
     @Test
     public void whenEmptyLoginThenNotValid() {
         User user = new User(1, "", "saa fff", "ddd@www.ru",
@@ -45,6 +46,7 @@ public class UserTests {
         assertEquals(1, violations.size(),
                 "Неожиданное количество нарушений при валидации null login");
     }
+
     @Test
     public void whenEmptyMailThenNotValid() {
         User user = new User(1, "darius", "saa fff", null,

@@ -11,12 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FilmTests {
 
-//    название не может быть пустым;
+    //    название не может быть пустым;
 //    максимальная длина описания — 200 символов;
 //    дата релиза — не раньше 28 декабря 1895 года;
 //    продолжительность фильма должна быть положительным числом.
     @Test
-    public void whenNameIsEmptyThenNotValid () {
+    public void whenNameIsEmptyThenNotValid() {
 
         Film film = new Film(1,
                 "",
@@ -29,7 +29,7 @@ public class FilmTests {
     }
 
     @Test
-    public void whenDescriptionIsBigThenNotValid () {
+    public void whenDescriptionIsBigThenNotValid() {
 
         Film film = new Film(1,
                 "gerg ergewrgewger",
@@ -44,7 +44,7 @@ public class FilmTests {
     }
 
     @Test
-    public void whenDescriptionLengthIs200ThenValid () {
+    public void whenDescriptionLengthIs200ThenValid() {
 
         Film film = new Film(1,
                 "gerg ergewrgewger",
@@ -59,7 +59,7 @@ public class FilmTests {
     }
 
     @Test
-    public void whenReleaseDateBeforeCinemaEpochThenNotValid () {
+    public void whenReleaseDateBeforeCinemaEpochThenNotValid() {
 
         Film film = new Film(1,
                 "gerg ergewrgewger",
@@ -72,7 +72,7 @@ public class FilmTests {
     }
 
     @Test
-    public void whenReleaseDateAfterCinemaEpochThenValid () {
+    public void whenReleaseDateAfterCinemaEpochThenValid() {
 
         Film film = new Film(1,
                 "gerg ergewrgewger",
@@ -85,7 +85,7 @@ public class FilmTests {
     }
 
     @Test
-    public void whenDurationZeroThenNotValid () {
+    public void whenDurationZeroThenNotValid() {
 
         Film film = new Film(1,
                 "gerg ergewrgewger",
