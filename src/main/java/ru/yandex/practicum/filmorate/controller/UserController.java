@@ -16,10 +16,11 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
 
-    Map<Integer, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
 
     @GetMapping
-    public List<User> list() {
+    public List<User> getAllUsers() {
+        log.debug("GET users");
         return new ArrayList<>(users.values());
     }
 

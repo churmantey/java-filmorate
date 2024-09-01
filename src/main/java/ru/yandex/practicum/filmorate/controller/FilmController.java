@@ -16,10 +16,11 @@ import java.util.Map;
 @RequestMapping("/films")
 public class FilmController {
 
-    Map<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
 
     @GetMapping
-    public List<Film> list() {
+    public List<Film> getAllFilms() {
+        log.debug("GET films");
         return new ArrayList<>(films.values());
     }
 
