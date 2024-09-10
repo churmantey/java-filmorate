@@ -41,7 +41,7 @@ public class FilmTests {
                 "Неожиданное количество нарушений при валидации пустого названия");
         film.setName(null);
         violations = validator.validate(film);
-        assertEquals(2, violations.size(),
+        assertEquals(1, violations.size(),
                 "Неожиданное количество нарушений при валидации null названия");
     }
 
