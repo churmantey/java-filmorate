@@ -38,5 +38,4 @@ public class User {
         }
         this.friends = new HashSet<>();
     }
-
 }
