@@ -4,12 +4,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Film.
@@ -17,17 +18,16 @@ import java.time.LocalDate;
 
 @Slf4j
 @Data
-@AllArgsConstructor
 public class Film {
 
-    public static final LocalDate CINEMA_EPOCH = LocalDate.of(1895, 12, 28);
+    private static final LocalDate CINEMA_EPOCH = LocalDate.of(1895, 12, 28);
 
     private Integer id;
 
     @NotBlank
     private String name;
 
-    @Size(min = 0, max = 200)
+    @Size(max = 200)
     private String description;
 
     @PastOrPresent
@@ -36,18 +36,20 @@ public class Film {
     @Positive
     private Integer duration;
 
+    private final Set<Integer> likes;
+
+    public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.likes = new HashSet<>();
+    }
+
     public void validate() {
-        String message = "";
-        if (this.getReleaseDate().isBefore(CINEMA_EPOCH)) {
-            message = "Некорректная дата выхода фильма";
-        } else if (this.getName().isBlank()) {
-            message = "Название фильма не заполнено";
-        } else if (this.getDescription().length() > 200) {
-            message = "Слишком длинное описание фильма";
-        } else if (this.duration <= 0) {
-            message = "Длительность фильма должна быть положительным числом";
-        }
-        if (!message.isBlank()) {
+        if (this.getReleaseDate() == null || this.getReleaseDate().isBefore(CINEMA_EPOCH)) {
+            String message = "Некорректная дата выхода фильма";
             log.debug(message);
             throw new ValidationException(message);
         }

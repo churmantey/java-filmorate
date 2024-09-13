@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -13,13 +14,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserTests {
 
-    ValidatorFactory factory = buildDefaultValidatorFactory();
-    Validator validator = factory.getValidator();
+    private final ValidatorFactory factory = buildDefaultValidatorFactory();
+    private final Validator validator = factory.getValidator();
+
+    private User user;
+
+    @BeforeEach
+    public void setUp() {
+        user = new User(1, "userlogin", "user name", "some@email.here",
+                LocalDate.of(1975, 12, 1));
+    }
 
     @Test
     public void whenIncorrectLoginThenNotValid() {
-        User user = new User(1, "rt yeryt", "saa fff", "ddd@www.ru",
-                LocalDate.of(1975, 12, 1));
+        user.setLogin("rt yeryt");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(1, violations.size(),
                 "Неожиданное количество нарушений при валидации плохого логина");
@@ -29,8 +37,7 @@ public class UserTests {
 
     @Test
     public void whenEmptyLoginThenNotValid() {
-        User user = new User(1, "", "saa fff", "ddd@www.ru",
-                LocalDate.of(1975, 12, 1));
+        user.setLogin("");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(1, violations.size(),
                 "Неожиданное количество нарушений при валидации пустого логина");
@@ -40,8 +47,7 @@ public class UserTests {
 
     @Test
     public void whenNullLoginThenNotValid() {
-        User user = new User(1, null, "saa fff", "ddd@www.ru",
-                LocalDate.of(1975, 12, 1));
+        user.setLogin(null);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(1, violations.size(),
                 "Неожиданное количество нарушений при валидации null login");
@@ -49,13 +55,11 @@ public class UserTests {
 
     @Test
     public void whenEmptyMailThenNotValid() {
-        User user = new User(1, "darius", "saa fff", null,
-                LocalDate.of(1975, 12, 1));
+        user.setEmail(null);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(1, violations.size(),
                 "Неожиданное количество нарушений при валидации null email");
-        user = new User(1, "darius", "saa fff", "",
-                LocalDate.of(1975, 12, 1));
+        user.setEmail("");
         violations = validator.validate(user);
         assertEquals(1, violations.size(),
                 "Неожиданное количество нарушений при валидации пустого email");
@@ -63,8 +67,7 @@ public class UserTests {
 
     @Test
     public void whenMalformedMailThenNotValid() {
-        User user = new User(1, "darius", "saa fff", "@erert_rr",
-                LocalDate.of(1975, 12, 1));
+        user.setEmail("@erert_rr");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(1, violations.size(),
                 "Неожиданное количество нарушений при валидации плохого email");
@@ -72,8 +75,7 @@ public class UserTests {
 
     @Test
     public void whenUserIsGuestFromFutureThenNotValid() {
-        User user = new User(1, "Alice", "Alice Seleznyova", "i@am.here",
-                LocalDate.of(2080, 12, 1));
+        user.setBirthday(LocalDate.of(2080, 12, 1));
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(1, violations.size(),
                 "Неожиданное количество нарушений при валидации даты рождения");

@@ -4,25 +4,28 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class User {
 
-    Integer id;
+    private Integer id;
 
     @NotNull
     @Pattern(regexp = "(\\w)+", message = "Логин не дожен быть пустым и содержать пробелы или спецсимволы")
-    String login;
+    private String login;
 
-    @NotNull
-    String name;
+    private String name;
 
     @NotBlank
     @Email
-    String email;
+    private String email;
 
-    @Past
-    LocalDate birthday;
+    @PastOrPresent
+    private LocalDate birthday;
+
+    private final Set<Integer> friends;
 
     public User(Integer id, String login, String name, String email, LocalDate birthday) {
         this.id = id;
@@ -33,6 +36,7 @@ public class User {
         if (this.name == null || this.name.isBlank()) {
             this.name = this.login;
         }
+        this.friends = new HashSet<>();
     }
 
 }
