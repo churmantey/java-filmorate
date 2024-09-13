@@ -27,7 +27,7 @@ public class FilmController {
 
     @GetMapping("/{filmId}")
     public Film getFilm(@PathVariable Integer filmId) {
-        log.debug("GET film {}", filmId);
+        log.debug("GET film  {}", filmId);
         return filmService.getFilmById(filmId);
     }
 
