@@ -1,8 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class IdGenerator {
 
     private Integer id;
@@ -12,7 +9,7 @@ public class IdGenerator {
     }
 
     public Integer getNextId() {
-        return id++;
+        return ++id;
     }
 
     public void setId(Integer id) {

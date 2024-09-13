@@ -58,7 +58,7 @@ public class FilmService {
 
     public List<Film> getTopRatedFilms(int count) {
         return filmStorage.getAllElements().stream()
-                .sorted(new FilmLikesComparator())
+                .sorted(new FilmLikesComparator().reversed())
                 .limit(count)
                 .toList();
     }

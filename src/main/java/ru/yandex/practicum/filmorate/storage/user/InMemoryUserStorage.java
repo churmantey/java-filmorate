@@ -47,6 +47,9 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateElement(User newElement) {
+        if (newElement == null) {
+            throw new NullUserException("Не найден пользователь null");
+        }
         if (storage.containsKey(newElement.getId())) {
             User oldUser = storage.get(newElement.getId());
             oldUser.setLogin(newElement.getLogin());
@@ -55,7 +58,7 @@ public class InMemoryUserStorage implements UserStorage {
             oldUser.setEmail(newElement.getEmail());
             return oldUser;
         }
-        return null;
+        throw new NotFoundException("Не найден пользователь с id = " + newElement.getId());
     }
 
     @Override

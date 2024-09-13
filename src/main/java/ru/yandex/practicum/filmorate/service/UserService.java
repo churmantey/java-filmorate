@@ -40,6 +40,7 @@ public class UserService {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
         user.getFriends().add(friend.getId());
+        friend.getFriends().add(user.getId());
         return user;
     }
 
@@ -47,6 +48,7 @@ public class UserService {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
         user.getFriends().remove(friend.getId());
+        friend.getFriends().remove(user.getId());
         return user;
     }
 
