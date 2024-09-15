@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BaseStorage<T> {
 
@@ -13,7 +12,7 @@ public interface BaseStorage<T> {
 
     List<T> getAllElements();
 
-    Optional<T> getElement(Integer id);
+    T getElement(Integer id);
 
     T deleteElementById(Integer id);
 

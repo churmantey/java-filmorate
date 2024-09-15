@@ -2,11 +2,13 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.NullFilmException;
-import ru.yandex.practicum.filmorate.exception.NullUserException;
+import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -26,7 +28,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User deleteElement(User element) {
         if (element == null) {
-            throw new NullFilmException("Не найден пользователь null");
+            throw new NullObjectException("Не найден пользователь null");
         }
         if (storage.containsKey(element.getId())) {
             return storage.remove(element.getId());
@@ -37,7 +39,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User deleteElementById(Integer id) {
         if (id == null) {
-            throw new NullUserException("Не найден пользователь с id null");
+            throw new NullObjectException("Не найден пользователь с id null");
         }
         if (storage.containsKey(id)) {
             return storage.remove(id);
@@ -48,7 +50,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateElement(User newElement) {
         if (newElement == null) {
-            throw new NullUserException("Не найден пользователь null");
+            throw new NullObjectException("Не найден пользователь null");
         }
         if (storage.containsKey(newElement.getId())) {
             User oldUser = storage.get(newElement.getId());
@@ -67,7 +69,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> getElement(Integer id) {
-        return Optional.ofNullable(storage.get(id));
+    public User getElement(Integer id) {
+        return storage.get(id);
     }
 }

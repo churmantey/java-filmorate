@@ -2,10 +2,13 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.NullFilmException;
+import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -25,7 +28,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film deleteElement(Film element) {
         if (element == null) {
-            throw new NullFilmException("Не найден фильм null");
+            throw new NullObjectException("Не найден фильм null");
         }
         if (storage.containsKey(element.getId())) {
             return storage.remove(element.getId());
@@ -36,7 +39,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film deleteElementById(Integer id) {
         if (id == null) {
-            throw new NullFilmException("Не найден фильм с id null");
+            throw new NullObjectException("Не найден фильм с id null");
         }
         if (storage.containsKey(id)) {
             return storage.remove(id);
@@ -47,7 +50,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film updateElement(Film newElement) {
         if (newElement == null) {
-            throw new NullFilmException("Не найден фильм null");
+            throw new NullObjectException("Не найден фильм null");
         }
         newElement.validate();
         if (storage.containsKey(newElement.getId())) {
@@ -67,7 +70,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> getElement(Integer id) {
-        return Optional.ofNullable(storage.get(id));
+    public Film getElement(Integer id) {
+        return storage.get(id);
     }
 }
