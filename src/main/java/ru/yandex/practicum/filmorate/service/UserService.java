@@ -1,56 +1,21 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 
-@Service
-public class UserService {
+public interface UserService {
 
-    private final UserStorage userStorage;
-    private final IdGenerator idGenerator;
+    User createUser(User user);
 
-    @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-        this.idGenerator = new IdGenerator();
-    }
+    User updateUser(User user);
 
+    User deleteUser(User user);
 
-    public User getUserById(Integer userId) {
-        if (userId == null) {
-            throw new NullObjectException("Передан id пользователя null");
-        }
-        User user = userStorage.getElement(userId);
-        if (user == null) {
-            throw new NotFoundException("Не найден пользователь с id = " + userId);
-        }
-        return user;
-    }
+    User deleteUserById(Integer id);
 
-    public User createUser(User user) {
-        user.setId(idGenerator.getNextId());
-        return userStorage.addElement(user);
-    }
+    List<User> getAllUsers();
 
-    public User updateUser(User user) {
-        return userStorage.updateElement(user);
-    }
+    User getUserById(Integer userId);
 
-    public User deleteUser(User user) {
-        return userStorage.deleteElement(user);
-    }
-
-    public User deleteUserById(Integer id) {
-        return userStorage.deleteElementById(id);
-    }
-
-    public List<User> getAllUsers() {
-        return userStorage.getAllElements();
-    }
 }
