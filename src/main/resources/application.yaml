@@ -1,0 +1,6 @@
+logging:
+  level:
+    ru.yandex.practicum.filmorate.controller: DEBUG
+    org:
+      zalando:
+        logbook: TRACE

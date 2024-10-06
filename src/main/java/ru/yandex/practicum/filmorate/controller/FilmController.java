@@ -1,61 +1,45 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
+@RequiredArgsConstructor
 public class FilmController {
 
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final FilmService filmService;
 
     @GetMapping
     public List<Film> getAllFilms() {
-        log.debug("GET films");
-        return new ArrayList<>(films.values());
+        log.info("GET films");
+        return filmService.getAllFilms();
     }
+
+    @GetMapping("/{filmId}")
+    public Film getFilm(@PathVariable Integer filmId) {
+        log.info("GET film {}", filmId);
+        return filmService.getFilmById(filmId);
+    }
+
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        log.debug("POST film {}", film);
-        film.validate();
-        film.setId(getNextId());
-        films.put(film.getId(), film);
-        return film;
+        log.info("POST film {}", film);
+        return filmService.createFilm(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film newFilm) {
-        log.debug("PUT film {}", newFilm);
-        newFilm.validate();
-        if (films.containsKey(newFilm.getId())) {
-            Film oldFilm = films.get(newFilm.getId());
-            oldFilm.setName(newFilm.getName());
-            oldFilm.setDescription(newFilm.getDescription());
-            oldFilm.setReleaseDate(newFilm.getReleaseDate());
-            oldFilm.setDuration(newFilm.getDuration());
-            return oldFilm;
-        }
-        log.debug("Film not found {}", newFilm);
-        throw new NotFoundException("Фильм с id " + newFilm.getId() + " не найден");
-    }
-
-    private Integer getNextId() {
-        Integer currentMaxId = films.keySet()
-                .stream()
-                .mapToInt(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+        log.info("PUT film {}", newFilm);
+        return filmService.updateFilm(newFilm);
     }
 
 }
