@@ -1,10 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
@@ -36,18 +40,41 @@ public class Film {
     @Positive
     private Integer duration;
 
-    private Integer rating;
+    private Integer mpa;
 
+    @Getter
     private final Set<Integer> likes;
+    @Getter
     private final Set<Integer> genres;
 
+    public Film() {
+        this.id = 0;
+        this.name = "";
+        this.description = "";
+        this.releaseDate = null;
+        this.duration = 0;
+        this.mpa = 0;
+        this.likes = new HashSet<>();
+        this.genres = new HashSet<>();
+    }
+
+    public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration, Integer mpa) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = mpa;
+        this.likes = new HashSet<>();
+        this.genres = new HashSet<>();
+    }
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.rating = 0;
+        this.mpa = 0;
         this.likes = new HashSet<>();
         this.genres = new HashSet<>();
     }

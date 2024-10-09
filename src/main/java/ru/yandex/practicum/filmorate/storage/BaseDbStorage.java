@@ -27,6 +27,10 @@ public class BaseDbStorage<T> {
         }
     }
 
+    protected List<Integer> retrieveIdList(String query, Object... params) {
+        return jdbc.queryForList(query, Integer.class, params);
+    }
+
     protected List<T> findMany(String query, Object... params) {
         return jdbc.query(query, mapper, params);
     }

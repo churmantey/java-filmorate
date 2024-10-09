@@ -25,6 +25,15 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "title = ?, description = ?, release_date = ?, duration = ?, rating_id = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM " + tableName + " WHERE id = ?";
 
+    private static final String INSERT_LIKES_QUERY = "INSERT INTO film_likes" +
+            " (film_id, user_id) VALUES (?, ?)";
+    private static final String FIND_LIKES_QUERY = "SELECT user_id FROM film_likes WHERE film_id = ?";
+    private static final String DELETE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ?";
+    private static final String INSERT_GENRES_QUERY = "INSERT INTO film_genres" +
+            " (film_id, genre_id) VALUES (?, ?)";
+    private static final String FIND_GENRES_QUERY = "SELECT genre_id FROM film_genres WHERE film_id = ?";
+    private static final String DELETE_GENRES_QUERY = "DELETE FROM film_genres WHERE film_id = ?";
+
     private final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public FilmDbStorage (JdbcTemplate jdbcTemplate, RowMapper<Film> mapper) {
@@ -33,28 +42,29 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public Film addElement(Film film) {
-
         Integer newId = insert(INSERT_QUERY,
                 film.getName(),
                 film.getDescription(),
                 film.getReleaseDate().format( DATE_FORMATTER),
                 film.getDuration(),
-                film.getRating()
+                film.getMpa()
         );
         film.setId(newId);
 
-        //film.getGenres()
+        addFilmLikesAndGenres(film);
 
         return film;
     }
 
     @Override
     public boolean deleteElement(Film film) {
+        deleteFilmLikesAndGenres(film.getId());
         return delete(DELETE_QUERY, film.getId());
     }
 
     @Override
     public boolean deleteElementById(Integer id) {
+        deleteFilmLikesAndGenres(id);
         return delete(DELETE_QUERY, id);
     }
 
@@ -65,19 +75,49 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 newFilm.getDescription(),
                 newFilm.getReleaseDate().format(DATE_FORMATTER),
                 newFilm.getDuration(),
-                newFilm.getRating(),
+                newFilm.getMpa(),
                 newFilm.getId());
+
+        deleteFilmLikesAndGenres(newFilm.getId());
+        addFilmLikesAndGenres(newFilm);
+
         return newFilm;
     }
 
     @Override
     public List<Film> getAllElements() {
-        return findMany(FIND_ALL_QUERY);
+        List<Film> baseList = findMany(FIND_ALL_QUERY);
+        baseList.forEach(this::setFilmLikesAndGenres);
+        return baseList;
     }
 
     @Override
     public Film getElement(Integer id) {
-        return findOne(FIND_BY_ID_QUERY, id)
+        Film film = findOne(FIND_BY_ID_QUERY, id)
                 .orElseThrow(() -> new NotFoundException("Не найден фильм с id = " + id));
+        setFilmLikesAndGenres(film);
+        return film;
+    }
+
+    // заполняет коллекции жанров и лайков в фильме по данным из БД
+    private void setFilmLikesAndGenres (Film film) {
+        film.getLikes().addAll(retrieveIdList(FIND_LIKES_QUERY, film.getId()));
+        film.getGenres().addAll(retrieveIdList(FIND_GENRES_QUERY, film.getId()));
+    }
+
+    //добавляет лайки и жанры фильма в БД
+    private void addFilmLikesAndGenres(Film film) {
+        if (!film.getLikes().isEmpty()) {
+            film.getLikes().forEach(userId -> update(INSERT_LIKES_QUERY, film.getId(), userId));
+        }
+        if (!film.getGenres().isEmpty()) {
+            film.getGenres().forEach(genreId -> update(INSERT_GENRES_QUERY, film.getId(), genreId));
+        }
+    }
+
+    //удвляет все лайки и жанры по id фильма в БД
+    private void deleteFilmLikesAndGenres(Integer filmId) {
+        delete(DELETE_LIKES_QUERY, filmId);
+        delete(DELETE_GENRES_QUERY, filmId);
     }
 }

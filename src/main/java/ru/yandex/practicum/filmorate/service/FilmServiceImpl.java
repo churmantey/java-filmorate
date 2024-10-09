@@ -12,11 +12,16 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class FilmServiceImpl implements FilmService {
 
-    private final FilmDbStorage filmStorage;
+    private final FilmStorage filmStorage;
     private final IdGenerator idGenerator;
+
+    public FilmServiceImpl(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                           IdGenerator idGenerator) {
+        this.filmStorage = filmStorage;
+        this.idGenerator = idGenerator;
+    }
 
     @Override
     public Film getFilmById(Integer filmId) {
