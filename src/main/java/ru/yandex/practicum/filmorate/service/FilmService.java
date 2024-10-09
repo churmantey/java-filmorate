@@ -12,9 +12,9 @@ public interface FilmService {
 
     Film updateFilm(Film film);
 
-    Film deleteFilm(Film film);
+    boolean deleteFilm(Film film);
 
-    Film deleteFilmById(Integer id);
+    boolean deleteFilmById(Integer id);
 
     List<Film> getAllFilms();
 

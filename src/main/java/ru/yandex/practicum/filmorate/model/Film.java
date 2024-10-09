@@ -36,7 +36,10 @@ public class Film {
     @Positive
     private Integer duration;
 
+    private Integer rating;
+
     private final Set<Integer> likes;
+    private final Set<Integer> genres;
 
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration) {
         this.id = id;
@@ -44,7 +47,9 @@ public class Film {
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.rating = 0;
         this.likes = new HashSet<>();
+        this.genres = new HashSet<>();
     }
 
     public void validate() {

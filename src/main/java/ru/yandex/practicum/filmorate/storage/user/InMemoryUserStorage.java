@@ -26,23 +26,25 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User deleteElement(User element) {
+    public boolean deleteElement(User element) {
         if (element == null) {
             throw new NullObjectException("Не найден пользователь null");
         }
         if (storage.containsKey(element.getId())) {
-            return storage.remove(element.getId());
+            storage.remove(element.getId());
+            return true;
         }
         throw new NotFoundException("Не найден пользователь с id = " + element.getId());
     }
 
     @Override
-    public User deleteElementById(Integer id) {
+    public boolean deleteElementById(Integer id) {
         if (id == null) {
             throw new NullObjectException("Не найден пользователь с id null");
         }
         if (storage.containsKey(id)) {
-            return storage.remove(id);
+            storage.remove(id);
+            return true;
         }
         throw new NotFoundException("Не найден пользователь с id = " + id);
     }

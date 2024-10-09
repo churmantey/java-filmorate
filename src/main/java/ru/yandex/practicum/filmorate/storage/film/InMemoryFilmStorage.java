@@ -26,23 +26,25 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film deleteElement(Film element) {
+    public boolean deleteElement(Film element) {
         if (element == null) {
             throw new NullObjectException("Не найден фильм null");
         }
         if (storage.containsKey(element.getId())) {
-            return storage.remove(element.getId());
+            storage.remove(element.getId());
+            return true;
         }
         throw new NotFoundException("Не найден фильм с id = " + element.getId());
     }
 
     @Override
-    public Film deleteElementById(Integer id) {
+    public boolean deleteElementById(Integer id) {
         if (id == null) {
             throw new NullObjectException("Не найден фильм с id null");
         }
         if (storage.containsKey(id)) {
-            return storage.remove(id);
+            storage.remove(id);
+            return true;
         }
         throw new NotFoundException("Не найден фильм с id = " + id);
     }

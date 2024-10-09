@@ -10,9 +10,9 @@ public interface UserService {
 
     User updateUser(User user);
 
-    User deleteUser(User user);
+    boolean deleteUser(User user);
 
-    User deleteUserById(Integer id);
+    boolean deleteUserById(Integer id);
 
     List<User> getAllUsers();
 

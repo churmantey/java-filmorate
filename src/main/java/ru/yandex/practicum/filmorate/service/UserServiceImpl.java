@@ -40,12 +40,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User deleteUser(User user) {
+    public boolean deleteUser(User user) {
         return userStorage.deleteElement(user);
     }
 
     @Override
-    public User deleteUserById(Integer id) {
+    public boolean deleteUserById(Integer id) {
         return userStorage.deleteElementById(id);
     }
 

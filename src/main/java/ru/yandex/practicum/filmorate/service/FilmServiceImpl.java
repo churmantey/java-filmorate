@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FilmServiceImpl implements FilmService {
 
-    private final FilmStorage filmStorage;
+    private final FilmDbStorage filmStorage;
     private final IdGenerator idGenerator;
 
     @Override
@@ -42,12 +44,12 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Film deleteFilm(Film film) {
+    public boolean deleteFilm(Film film) {
         return filmStorage.deleteElement(film);
     }
 
     @Override
-    public Film deleteFilmById(Integer id) {
+    public boolean deleteFilmById(Integer id) {
         return filmStorage.deleteElementById(id);
     }
 
