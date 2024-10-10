@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -36,8 +37,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     private final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public FilmDbStorage (JdbcTemplate jdbcTemplate, RowMapper<Film> mapper) {
+    private final GenreStorage genreStorage;
+
+    public FilmDbStorage (JdbcTemplate jdbcTemplate, RowMapper<Film> mapper, GenreStorage genreStorage) {
         super(jdbcTemplate, mapper);
+        this.genreStorage = genreStorage;
     }
 
     @Override
@@ -102,7 +106,8 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     // заполняет коллекции жанров и лайков в фильме по данным из БД
     private void setFilmLikesAndGenres (Film film) {
         film.getLikes().addAll(retrieveIdList(FIND_LIKES_QUERY, film.getId()));
-        film.getGenres().addAll(retrieveIdList(FIND_GENRES_QUERY, film.getId()));
+        //film.getGenres().addAll(retrieveIdList(FIND_GENRES_QUERY, film.getId()));
+        film.getGenres().addAll(genreStorage.getFilmGenresById(film.getId()));
     }
 
     //добавляет лайки и жанры фильма в БД

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
+import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -32,10 +33,9 @@ public class FilmController {
 
 
     @PostMapping
-    public Film create(@Valid @RequestBody NewFilmRequest film) {
-        log.info("POST film {}", film);
-        return new Film();
-        //return filmService.createFilm(film);
+    public Film create(@Valid @RequestBody NewFilmRequest newFilmRequest) {
+        log.info("POST film {}", newFilmRequest);
+        return filmService.createFilm(newFilmRequest);
     }
 
     @PutMapping

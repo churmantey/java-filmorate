@@ -40,12 +40,12 @@ public class Film {
     @Positive
     private Integer duration;
 
-    private Integer mpa;
+    private Rating mpa;
 
     @Getter
     private final Set<Integer> likes;
     @Getter
-    private final Set<Integer> genres;
+    private final Set<Genre> genres;
 
     public Film() {
         this.id = 0;
@@ -53,18 +53,18 @@ public class Film {
         this.description = "";
         this.releaseDate = null;
         this.duration = 0;
-        this.mpa = 0;
+        this.mpa = null;
         this.likes = new HashSet<>();
         this.genres = new HashSet<>();
     }
 
-    public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration, Integer mpa) {
+    public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.mpa = mpa;
+        this.mpa = new Rating(mpaId);
         this.likes = new HashSet<>();
         this.genres = new HashSet<>();
     }
@@ -74,7 +74,7 @@ public class Film {
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.mpa = 0;
+        this.mpa = null;
         this.likes = new HashSet<>();
         this.genres = new HashSet<>();
     }

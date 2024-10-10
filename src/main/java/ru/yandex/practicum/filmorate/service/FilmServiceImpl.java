@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
+import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -36,9 +38,10 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Film createFilm(Film film) {
-        film.validate();
-        film.setId(idGenerator.getNextId());
+    public Film createFilm(NewFilmRequest newFilmRequest) {
+        Film film = FilmMapper.mapToFilm(newFilmRequest);
+        //film.validate();
+        //film.setId(idGenerator.getNextId());
         return filmStorage.addElement(film);
     }
 
