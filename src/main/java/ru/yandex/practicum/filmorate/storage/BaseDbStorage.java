@@ -9,11 +9,14 @@ import ru.yandex.practicum.filmorate.exception.DatabaseOperationException;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 public class BaseDbStorage<T> {
+
+    public final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     protected final JdbcTemplate jdbc;
     protected final RowMapper<T> mapper;
@@ -59,7 +62,7 @@ public class BaseDbStorage<T> {
 
         Integer id = keyHolder.getKeyAs(Integer.class);
 
-        // Возвращаем id добавленной строки пользователя
+        // Возвращаем id добавленной строки
         if (id != null) {
             return id;
         } else {

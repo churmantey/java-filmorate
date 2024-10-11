@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmLikesComparator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +36,14 @@ public class InMemoryFilmStorage implements FilmStorage {
             return true;
         }
         throw new NotFoundException("Не найден фильм с id = " + element.getId());
+    }
+
+    @Override
+    public List<Film> getTopRatedFilms(int count) {
+        return storage.values().stream()
+                .sorted(new FilmLikesComparator().reversed())
+                .limit(count)
+                .toList();
     }
 
     @Override

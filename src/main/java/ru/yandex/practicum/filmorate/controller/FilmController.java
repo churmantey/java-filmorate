@@ -4,7 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
+import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -20,28 +22,28 @@ public class FilmController {
     private final FilmService filmService;
 
     @GetMapping
-    public List<Film> getAllFilms() {
+    public List<FilmDto> getAllFilms() {
         log.info("GET films");
         return filmService.getAllFilms();
     }
 
     @GetMapping("/{filmId}")
-    public Film getFilm(@PathVariable Integer filmId) {
+    public FilmDto getFilm(@PathVariable Integer filmId) {
         log.info("GET film {}", filmId);
         return filmService.getFilmById(filmId);
     }
 
 
     @PostMapping
-    public Film create(@Valid @RequestBody NewFilmRequest newFilmRequest) {
+    public FilmDto create(@Valid @RequestBody NewFilmRequest newFilmRequest) {
         log.info("POST film {}", newFilmRequest);
         return filmService.createFilm(newFilmRequest);
     }
 
     @PutMapping
-    public Film update(@Valid @RequestBody Film newFilm) {
-        log.info("PUT film {}", newFilm);
-        return filmService.updateFilm(newFilm);
+    public FilmDto update(@Valid @RequestBody UpdateFilmRequest updateFilmRequest) {
+        log.info("PUT film {}", updateFilmRequest);
+        return filmService.updateFilm(updateFilmRequest);
     }
 
 }

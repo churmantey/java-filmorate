@@ -2,6 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
+import ru.yandex.practicum.filmorate.dto.IdEntity;
+import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -15,27 +18,24 @@ public class FilmLikesServiceImpl implements FilmLikesService {
     private final UserService userService;
 
     @Override
-    public Film addLike(Integer filmId, Integer userId) {
-        Film film = filmService.getFilmById(filmId);
-        User user = userService.getUserById(userId);
-        film.getLikes().add(user.getId());
+    public FilmDto addLike(Integer filmId, Integer userId) {
+        FilmDto film = filmService.getFilmById(filmId);
+        UserDto user = userService.getUserById(userId);
+        film.getLikes().add(new IdEntity(user.getId()));
         return film;
     }
 
     @Override
-    public Film removeLike(Integer filmId, Integer userId) {
-        Film film = filmService.getFilmById(filmId);
-        User user = userService.getUserById(userId);
-        film.getLikes().remove(user.getId());
+    public FilmDto removeLike(Integer filmId, Integer userId) {
+        FilmDto film = filmService.getFilmById(filmId);
+        UserDto user = userService.getUserById(userId);
+        //film.getLikes().remove(user.getId());
         return film;
     }
 
     @Override
-    public List<Film> getTopRatedFilms(int count) {
-        return filmService.getAllFilms().stream()
-                .sorted(new FilmLikesComparator().reversed())
-                .limit(count)
-                .toList();
+    public List<FilmDto> getTopRatedFilms(int count) {
+        return filmService.getTopRatedFilms(count);
     }
 
 }

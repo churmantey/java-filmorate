@@ -27,7 +27,7 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
 
-    private final Set<Integer> friends;
+    private final Set<User> friends;
 
     public User(Integer id, String login, String name, String email, LocalDate birthday) {
         this.id = id;

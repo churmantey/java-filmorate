@@ -1,21 +1,22 @@
 package ru.yandex.practicum.filmorate.service;
 
+import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 
 public interface UserService {
 
-    User createUser(User user);
+    UserDto createUser(User user);
 
-    User updateUser(User user);
+    UserDto updateUser(User user);
 
     boolean deleteUser(User user);
 
     boolean deleteUserById(Integer id);
 
-    List<User> getAllUsers();
+    List<UserDto> getAllUsers();
 
-    User getUserById(Integer userId);
+    UserDto getUserById(Integer userId);
 
 }
