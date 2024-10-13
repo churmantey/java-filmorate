@@ -1,19 +1,16 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -43,7 +40,7 @@ public class Film {
     private Rating mpa;
 
     @Getter
-    private final Set<Integer> likes;
+    private final Set<User> likes;
     @Getter
     private final Set<Genre> genres;
 
@@ -54,8 +51,8 @@ public class Film {
         this.releaseDate = null;
         this.duration = 0;
         this.mpa = null;
-        this.likes = new HashSet<>();
-        this.genres = new HashSet<>();
+        this.likes = new LinkedHashSet<>();
+        this.genres = new LinkedHashSet<>();
     }
 
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
@@ -65,9 +62,10 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = new Rating(mpaId);
-        this.likes = new HashSet<>();
-        this.genres = new HashSet<>();
+        this.likes = new LinkedHashSet<>();
+        this.genres = new LinkedHashSet<>();
     }
+
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration) {
         this.id = id;
         this.name = name;
@@ -75,8 +73,8 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = null;
-        this.likes = new HashSet<>();
-        this.genres = new HashSet<>();
+        this.likes = new LinkedHashSet<>();
+        this.genres = new LinkedHashSet<>();
     }
 
     public void validate() {

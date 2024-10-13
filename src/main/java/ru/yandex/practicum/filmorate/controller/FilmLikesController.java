@@ -34,7 +34,7 @@ public class FilmLikesController {
     //DELETE /films/{id}/like/{userId}
     @DeleteMapping("/{id}/like/{userId}")
     public FilmDto removeLike(@PathVariable Integer id,
-                           @PathVariable Integer userId) {
+                              @PathVariable Integer userId) {
         log.info("DELETE like film {} , user {}", id, userId);
         return filmLikesService.removeLike(id, userId);
     }

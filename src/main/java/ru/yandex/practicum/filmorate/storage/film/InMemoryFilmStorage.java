@@ -47,6 +47,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void addLike(Integer filmId, Integer userId) {
+
+    }
+
+    @Override
+    public void removeLike(Integer filmId, Integer userId) {
+
+    }
+
+    @Override
     public boolean deleteElementById(Integer id) {
         if (id == null) {
             throw new NullObjectException("Не найден фильм с id null");

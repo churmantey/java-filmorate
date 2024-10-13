@@ -41,18 +41,18 @@ public final class FilmMapper {
         if (film.getLikes() != null) {
             filmDto.getLikes().addAll(
                     film.getLikes().stream()
-                            .map(IdEntity::new)
+                            .map(user -> new IdEntity(user.getId(), user.getName()))
                             .toList()
             );
         }
         if (film.getMpa() != null) {
-            filmDto.setMpa(new IdEntity(film.getMpa().getId()));
+            filmDto.setMpa(new IdEntity(film.getMpa().getId(), film.getMpa().getName()));
         }
         if (film.getGenres() != null) {
             filmDto.getGenres().addAll(
                     film.getGenres().stream()
-                    .map(genre -> new IdEntity(genre.getId()))
-                    .toList());
+                            .map(genre -> new IdEntity(genre.getId(), genre.getName()))
+                            .toList());
         }
         return filmDto;
     }

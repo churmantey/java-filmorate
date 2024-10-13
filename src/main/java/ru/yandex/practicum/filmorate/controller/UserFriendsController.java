@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.service.UserFriendsService;
 
 import java.util.List;
@@ -18,31 +18,31 @@ public class UserFriendsController {
 
     //PUT /users/{id}/friends/{friendId}
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable Integer id,
-                          @PathVariable Integer friendId) {
+    public UserDto addFriend(@PathVariable Integer id,
+                             @PathVariable Integer friendId) {
         log.info("PUT add friend {} for user {}", friendId, id);
         return userFriendsService.addFriend(id, friendId);
     }
 
     //DELETE /users/{id}/friends/{friendId}
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User removeFriend(@PathVariable Integer id,
-                             @PathVariable Integer friendId) {
+    public UserDto removeFriend(@PathVariable Integer id,
+                                @PathVariable Integer friendId) {
         log.info("DELETE friend {} from user {} ", friendId, id);
         return userFriendsService.removeFriend(id, friendId);
     }
 
     //GET /users/{id}/friends
     @GetMapping("/{id}/friends")
-    public List<User> getUserFriends(@PathVariable Integer id) {
+    public List<UserDto> getUserFriends(@PathVariable Integer id) {
         log.info("GET user {} friends", id);
         return userFriendsService.getUserFriends(id);
     }
 
     //GET /users/{id}/friends/common/{otherId}
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getMutualFriends(@PathVariable Integer id,
-                                       @PathVariable Integer otherId) {
+    public List<UserDto> getMutualFriends(@PathVariable Integer id,
+                                          @PathVariable Integer otherId) {
         log.info("GET mutual friends of user {} and user {}", id, otherId);
         return userFriendsService.getMutualFriends(id, otherId);
     }

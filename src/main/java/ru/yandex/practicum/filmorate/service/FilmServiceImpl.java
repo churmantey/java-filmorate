@@ -63,6 +63,7 @@ public class FilmServiceImpl implements FilmService {
         validateGenres(updateFilmRequest.getGenres());
         Film film = FilmMapper.mapToFilm(updateFilmRequest);
         film.validate();
+        Film oldFilm = filmStorage.getElement(film.getId());
         return FilmMapper.mapToFilmDto(
                 filmStorage.updateElement(film)
         );
@@ -78,11 +79,6 @@ public class FilmServiceImpl implements FilmService {
         return filmStorage.deleteElementById(id);
     }
 
-    public List<FilmDto> getTopRatedFilms(int count) {
-        return filmStorage.getTopRatedFilms(count).stream()
-                .map(FilmMapper::mapToFilmDto)
-                .toList();
-    }
 
     @Override
     public List<FilmDto> getAllFilms() {

@@ -66,12 +66,29 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public User getElement(Integer id) {
+        return storage.get(id);
+    }
+
+    @Override
+    public List<User> getMutualFriends(Integer userId, Integer otherUserId) {
+        return null;
+    }
+
+    @Override
+    public User addUserFriend(Integer userId, Integer friendId) {
+        return null;
+    }
+
+    @Override
+    public User removeUserFriend(Integer userId, Integer friendId) {
+        return null;
+    }
+
+    @Override
     public List<User> getAllElements() {
         return new ArrayList<>(storage.values());
     }
 
-    @Override
-    public User getElement(Integer id) {
-        return storage.get(id);
-    }
+
 }

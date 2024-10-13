@@ -9,4 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IdEntity {
     private Integer id;
+    private String name;
+
+    public IdEntity(Integer id) {
+        this.id = id;
+    }
 }

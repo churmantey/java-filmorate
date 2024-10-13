@@ -24,9 +24,7 @@ public interface FilmService {
 
     List<FilmDto> getAllFilms();
 
-    void validateRating (Rating rating);
+    void validateRating(Rating rating);
 
-    void validateGenres (Collection<Genre> genreList);
-
-    public List<FilmDto> getTopRatedFilms(int count);
+    void validateGenres(Collection<Genre> genreList);
 }

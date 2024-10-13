@@ -4,9 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -28,6 +26,15 @@ public class User {
     private LocalDate birthday;
 
     private final Set<User> friends;
+
+    public User() {
+        this.friends = new HashSet<>();
+    }
+
+    public User(Integer id) {
+        this.id = id;
+        this.friends = new HashSet<>();
+    }
 
     public User(Integer id, String login, String name, String email, LocalDate birthday) {
         this.id = id;
