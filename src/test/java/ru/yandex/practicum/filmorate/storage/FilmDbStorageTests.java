@@ -61,7 +61,6 @@ public class FilmDbStorageTests {
 
     @Test
     public void testUpdateFilm() {
-        Integer currentId = film.getId();
         Film addedFilm = filmStorage.addElement(film);
 
         Integer id = addedFilm.getId();
@@ -97,17 +96,32 @@ public class FilmDbStorageTests {
 
     @Test
     public void testAddLike() {
-
+        film = filmStorage.addElement(film);
+        assertThat(film.getLikes()).hasSize(0);
+        filmStorage.addLike(film.getId(), 1);
+        film = filmStorage.getElement(film.getId());
+        assertThat(film.getLikes()).hasSize(1);
+        assertThat(film.getLikes().toArray()[0])
+                .hasFieldOrPropertyWithValue("id", 1);
     }
 
     @Test
     public void testRemoveLike() {
-
+        film = filmStorage.getElement(1); // Это фильм изначально с двумя лайками
+        assertThat(film.getLikes()).hasSize(2);
+        filmStorage.removeLike(film.getId(), 1);
+        film = filmStorage.getElement(film.getId());
+        assertThat(film.getLikes()).hasSize(1);
     }
 
     @Test
-    public void tesTopRated() {
-
+    public void testTopRated() {
+        List<Film> topList = filmStorage.getTopRatedFilms(5);
+        assertThat(topList).hasSizeGreaterThan(1);
+        for (int i = 0; i < topList.size() - 1; i++) {
+            assertThat(topList.get(i).getLikes().size())
+                    .isGreaterThanOrEqualTo(topList.get(i + 1).getLikes().size());
+        }
     }
 
 }

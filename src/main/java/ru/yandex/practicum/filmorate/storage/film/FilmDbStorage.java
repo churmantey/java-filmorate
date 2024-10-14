@@ -33,6 +33,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     private static final String INSERT_LIKES_QUERY = "INSERT INTO film_likes" +
             " (film_id, user_id) VALUES (?, ?)";
+    private static final String REMOVE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
     private static final String FIND_LIKES_QUERY = "SELECT user_id FROM film_likes WHERE film_id = ? ORDER BY user_id";
     private static final String DELETE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ?";
 
@@ -40,11 +41,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
 
-    public FilmDbStorage (JdbcTemplate jdbcTemplate,
-                          RowMapper<Film> mapper,
-                          @Qualifier("userDbStorage") UserStorage userStorage,
-                          GenreStorage genreStorage,
-                          RatingStorage ratingStorage) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate,
+                         RowMapper<Film> mapper,
+                         @Qualifier("userDbStorage") UserStorage userStorage,
+                         GenreStorage genreStorage,
+                         RatingStorage ratingStorage) {
         super(jdbcTemplate, mapper);
         this.userStorage = userStorage;
         this.genreStorage = genreStorage;
@@ -56,7 +57,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         Integer newId = insert(INSERT_QUERY,
                 film.getName(),
                 film.getDescription(),
-                film.getReleaseDate().format( DATE_FORMATTER),
+                film.getReleaseDate().format(DATE_FORMATTER),
                 film.getDuration(),
                 film.getMpa().getId()
         );
@@ -109,7 +110,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public void removeLike(Integer filmId, Integer userId) {
-        update(INSERT_LIKES_QUERY, filmId, userId);
+        update(REMOVE_LIKES_QUERY, filmId, userId);
     }
 
 
@@ -129,7 +130,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     // заполняет коллекции жанров и лайков в фильме по данным из БД
-    private void setFilmMpaLikesAndGenres (Film film) {
+    private void setFilmMpaLikesAndGenres(Film film) {
         film.setMpa(ratingStorage.getElement(film.getMpa().getId()));
         film.getLikes().addAll(
                 retrieveIdList(FIND_LIKES_QUERY, film.getId()).stream()

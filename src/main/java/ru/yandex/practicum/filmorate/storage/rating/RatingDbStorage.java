@@ -39,6 +39,11 @@ public class RatingDbStorage extends BaseDbStorage<Rating> implements RatingStor
     }
 
     @Override
+    public List<Rating> getAllElements() {
+        return findMany(FIND_ALL_QUERY);
+    }
+
+    @Override
     public Rating addElement(Rating element) {
         return null;
     }
@@ -51,11 +56,6 @@ public class RatingDbStorage extends BaseDbStorage<Rating> implements RatingStor
     @Override
     public Rating updateElement(Rating newElement) {
         return null;
-    }
-
-    @Override
-    public List<Rating> getAllElements() {
-        return findMany(FIND_ALL_QUERY);
     }
 
     @Override
