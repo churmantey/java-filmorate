@@ -93,8 +93,8 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     // Заполняет коллекцию друзей в объекте user
     private void setUserFriends(User user) {
-        user.getFriends().
-                addAll(
+        user.getFriends()
+                .addAll(
                         findMany(FIND_FRIENDS_QUERY, user.getId())
                 );
     }
