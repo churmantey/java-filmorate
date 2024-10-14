@@ -16,7 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BaseDbStorage<T> {
 
-    public final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     protected final JdbcTemplate jdbc;
     protected final RowMapper<T> mapper;
