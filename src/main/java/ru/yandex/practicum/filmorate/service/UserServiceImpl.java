@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
@@ -14,13 +14,10 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
-
-    public UserServiceImpl(@Qualifier("userDbStorage") UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
 
     @Override
     public UserDto getUserById(Integer userId) {
@@ -64,11 +61,6 @@ public class UserServiceImpl implements UserService {
         return userStorage.getAllElements().stream()
                 .map(UserMapper::mapToUserDto)
                 .toList();
-    }
-
-    @Override
-    public List<UserDto> getMutualFriends(Integer userId, Integer otherUserId) {
-        return null;
     }
 
 }

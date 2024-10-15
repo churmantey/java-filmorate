@@ -36,18 +36,14 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String REMOVE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
     private static final String FIND_LIKES_QUERY = "SELECT user_id FROM film_likes WHERE film_id = ? ORDER BY user_id";
     private static final String DELETE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ?";
-
-    private final UserStorage userStorage;
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate,
                          RowMapper<Film> mapper,
-                         @Qualifier("userDbStorage") UserStorage userStorage,
                          GenreStorage genreStorage,
                          RatingStorage ratingStorage) {
         super(jdbcTemplate, mapper);
-        this.userStorage = userStorage;
         this.genreStorage = genreStorage;
         this.ratingStorage = ratingStorage;
     }
@@ -64,7 +60,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         film.setId(newId);
         film.setMpa(ratingStorage.getElement(film.getMpa().getId()));
 
-        addFilmLikesAndGenres(film);
+        addFilmAndGenres(film);
 
         return film;
     }
@@ -92,7 +88,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 newFilm.getId());
 
         deleteFilmLikesAndGenres(newFilm.getId());
-        addFilmLikesAndGenres(newFilm);
+        addFilmAndGenres(newFilm);
         newFilm.setMpa(ratingStorage.getElement(newFilm.getMpa().getId()));
 
         return newFilm;
@@ -113,11 +109,14 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         update(REMOVE_LIKES_QUERY, filmId, userId);
     }
 
+    public List<Integer> getFilmLikes(Integer filmId) {
+        return retrieveIdList(FIND_LIKES_QUERY, filmId);
+    }
 
     @Override
     public List<Film> getAllElements() {
         List<Film> baseList = findMany(FIND_ALL_QUERY);
-        baseList.forEach(this::setFilmMpaLikesAndGenres);
+        baseList.forEach(this::setFilmMpaAndGenres);
         return baseList;
     }
 
@@ -125,27 +124,19 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     public Film getElement(Integer id) {
         Film film = findOne(FIND_BY_ID_QUERY, id)
                 .orElseThrow(() -> new NotFoundException("Не найден фильм с id = " + id));
-        setFilmMpaLikesAndGenres(film);
+        setFilmMpaAndGenres(film);
         return film;
     }
 
-    // заполняет коллекции жанров и лайков в фильме по данным из БД
-    private void setFilmMpaLikesAndGenres(Film film) {
+    // заполняет коллекции жанров в фильме по данным из БД
+    private void setFilmMpaAndGenres(Film film) {
         film.setMpa(ratingStorage.getElement(film.getMpa().getId()));
-        film.getLikes().addAll(
-                retrieveIdList(FIND_LIKES_QUERY, film.getId()).stream()
-                        .map(userStorage::getElement)
-                        .toList()
-        );
         film.getGenres().addAll(genreStorage.getFilmGenresById(film.getId()));
     }
 
-    //добавляет лайки и жанры фильма в БД
-    private void addFilmLikesAndGenres(Film film) {
+    //добавляет жанры фильма в БД
+    private void addFilmAndGenres(Film film) {
         genreStorage.updateFilmGenresById(film.getId(), film.getGenres());
-        if (!film.getLikes().isEmpty()) {
-            film.getLikes().forEach(userId -> update(INSERT_LIKES_QUERY, film.getId(), userId));
-        }
     }
 
     //удаляет все лайки и жанры по id фильма в БД

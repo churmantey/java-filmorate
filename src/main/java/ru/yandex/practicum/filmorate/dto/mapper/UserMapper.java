@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.dto.mapper;
 
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.dto.IdEntity;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
@@ -11,12 +10,12 @@ import ru.yandex.practicum.filmorate.model.User;
 public final class UserMapper {
 
     public static User mapToUser(NewUserRequest request) {
-        User user = new User();
-        user.setLogin(request.getLogin());
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setBirthday(request.getBirthday());
-        return user;
+        return new User(
+                request.getLogin(),
+                request.getName(),
+                request.getEmail(),
+                request.getBirthday()
+        );
     }
 
     public static User mapToUser(UpdateUserRequest request) {
@@ -32,13 +31,13 @@ public final class UserMapper {
         userDto.setLogin(user.getLogin());
         userDto.setEmail(user.getEmail());
         userDto.setBirthday(user.getBirthday());
-        if (user.getFriends() != null) {
-            userDto.getFriends().addAll(
-                    user.getFriends().stream()
-                            .map(friend -> new IdEntity(friend.getId(), friend.getName()))
-                            .toList()
-            );
-        }
+//        if (user.getFriends() != null) {
+//            userDto.getFriends().addAll(
+//                    user.getFriends().stream()
+//                            .map(friend -> new IdEntity(friend.getId(), friend.getName()))
+//                            .toList()
+//            );
+//        }
         return userDto;
     }
 

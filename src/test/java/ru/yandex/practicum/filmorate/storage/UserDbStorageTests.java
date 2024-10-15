@@ -29,17 +29,18 @@ public class UserDbStorageTests {
 
     @BeforeEach
     public void setUp() {
-        this.user = new User();
-        user.setLogin("fff");
-        user.setName("fff");
-        user.setEmail("no@mail.ru");
-        user.setBirthday(LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault()));
-
-        this.user2 = new User();
-        user2.setLogin("ggg");
-        user2.setName("ggg");
-        user2.setEmail("not@mail.ru");
-        user2.setBirthday(LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault()));
+        this.user = new User(
+                "fff",
+                "fff",
+                "no@mail.ru",
+                LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault())
+        );
+        this.user2 = new User(
+                "ggg",
+                "ggg",
+                "not@mail.ru",
+                LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault())
+        );
     }
 
 
@@ -71,7 +72,6 @@ public class UserDbStorageTests {
 
     @Test
     public void testUpdateUser() {
-        Integer currentId = user.getId();
         User addedUser = userStorage.addElement(user);
 
         Integer id = addedUser.getId();
@@ -115,10 +115,10 @@ public class UserDbStorageTests {
         user = userStorage.addElement(user);
         user2 = userStorage.addElement(user2);
         user = userStorage.addUserFriend(user.getId(), user2.getId());
-        assertThat(user.getFriends()).hasSize(1);
-        assertThat(user2.getFriends()).hasSize(0);
+        assertThat(userStorage.getUserFriends(user.getId())).hasSize(1);
+        assertThat(userStorage.getUserFriends(user2.getId())).hasSize(0);
         user2 = userStorage.addUserFriend(user2.getId(), user.getId());
-        assertThat(user2.getFriends()).hasSize(1);
+        assertThat(userStorage.getUserFriends(user2.getId())).hasSize(1);
     }
 
     @Test
@@ -126,9 +126,9 @@ public class UserDbStorageTests {
         user = userStorage.addElement(user);
         user2 = userStorage.addElement(user2);
         user = userStorage.addUserFriend(user.getId(), user2.getId());
-        assertThat(user.getFriends()).hasSize(1);
+        assertThat(userStorage.getUserFriends(user.getId())).hasSize(1);
         user = userStorage.removeUserFriend(user.getId(), user2.getId());
-        assertThat(user.getFriends()).hasSize(0);
+        assertThat(userStorage.getUserFriends(user.getId())).hasSize(0);
     }
 
 

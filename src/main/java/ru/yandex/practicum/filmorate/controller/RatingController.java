@@ -21,14 +21,14 @@ public class RatingController {
     private final RatingService ratingService;
 
     @GetMapping
-    public List<Rating> getAllRatings() {
+    public List<Rating> getAllMpa() {
         log.info("GET all ratings");
-        return ratingService.getAllRatings();
+        return ratingService.getAllMpa();
     }
 
     @GetMapping("/{ratingId}")
-    public Rating getFilm(@PathVariable Integer ratingId) {
+    public Rating getMpa(@PathVariable Integer ratingId) {
         log.info("GET rating {}", ratingId);
-        return ratingService.getRatingsById(ratingId);
+        return ratingService.getMpaById(ratingId);
     }
 }

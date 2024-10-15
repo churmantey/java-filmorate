@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.ComponentScan;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 
 import java.time.LocalDate;
@@ -27,12 +26,13 @@ public class FilmDbStorageTests {
 
     @BeforeEach
     public void setUp() {
-        this.film = new Film();
-        film.setName("film name");
-        film.setDescription("In a galaxy far far away");
-        film.setReleaseDate(LocalDate.of(1995, 4, 15));
-        film.setDuration(100);
-        film.setMpa(new Rating(1));
+        this.film = new Film(
+                "film name",
+                "In a galaxy far far away",
+                LocalDate.of(1995, 4, 15),
+                100,
+                1
+        );
     }
 
     @Test
@@ -97,21 +97,17 @@ public class FilmDbStorageTests {
     @Test
     public void testAddLike() {
         film = filmStorage.addElement(film);
-        assertThat(film.getLikes()).hasSize(0);
+        assertThat(filmStorage.getFilmLikes(film.getId())).hasSize(0);
         filmStorage.addLike(film.getId(), 1);
-        film = filmStorage.getElement(film.getId());
-        assertThat(film.getLikes()).hasSize(1);
-        assertThat(film.getLikes().toArray()[0])
-                .hasFieldOrPropertyWithValue("id", 1);
+        assertThat(filmStorage.getFilmLikes(film.getId())).hasSize(1);
     }
 
     @Test
     public void testRemoveLike() {
         film = filmStorage.getElement(1); // Это фильм изначально с двумя лайками
-        assertThat(film.getLikes()).hasSize(2);
+        assertThat(filmStorage.getFilmLikes(film.getId())).hasSize(2);
         filmStorage.removeLike(film.getId(), 1);
-        film = filmStorage.getElement(film.getId());
-        assertThat(film.getLikes()).hasSize(1);
+        assertThat(filmStorage.getFilmLikes(film.getId())).hasSize(1);
     }
 
     @Test
@@ -119,8 +115,8 @@ public class FilmDbStorageTests {
         List<Film> topList = filmStorage.getTopRatedFilms(5);
         assertThat(topList).hasSizeGreaterThan(1);
         for (int i = 0; i < topList.size() - 1; i++) {
-            assertThat(topList.get(i).getLikes().size())
-                    .isGreaterThanOrEqualTo(topList.get(i + 1).getLikes().size());
+            assertThat(filmStorage.getFilmLikes(topList.get(i).getId()).size())
+                    .isGreaterThanOrEqualTo(filmStorage.getFilmLikes(topList.get(i + 1).getId()).size());
         }
     }
 

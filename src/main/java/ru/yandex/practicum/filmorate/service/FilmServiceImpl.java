@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
@@ -20,19 +20,12 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class FilmServiceImpl implements FilmService {
 
     private final FilmStorage filmStorage;
     private final RatingStorage ratingStorage;
     private final GenreStorage genreStorage;
-
-    public FilmServiceImpl(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                           RatingStorage ratingStorage,
-                           GenreStorage genreStorage) {
-        this.filmStorage = filmStorage;
-        this.ratingStorage = ratingStorage;
-        this.genreStorage = genreStorage;
-    }
 
     @Override
     public FilmDto getFilmById(Integer filmId) {
@@ -87,16 +80,14 @@ public class FilmServiceImpl implements FilmService {
                 .toList();
     }
 
-    @Override
-    public void validateRating(Rating rating) {
+    private void validateRating(Rating rating) {
         if (rating == null
                 || !ratingStorage.isValidRatingId(rating.getId())) {
             throw new ValidationException("Рейтинг фильма не указан или не найден.");
         }
     }
 
-    @Override
-    public void validateGenres(Collection<Genre> genreList) {
+    private void validateGenres(Collection<Genre> genreList) {
         if (genreList != null) {
             for (Genre genre : genreList) {
                 if (!genreStorage.isValidGenreId(genre.getId())) {

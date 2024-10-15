@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -37,21 +34,18 @@ public class Film {
     @Positive
     private Integer duration;
 
+    @NotNull
     private Rating mpa;
 
     @Getter
-    private final Set<User> likes;
-    @Getter
     private final Set<Genre> genres;
 
-    public Film() {
-        this.id = 0;
-        this.name = "";
-        this.description = "";
-        this.releaseDate = null;
-        this.duration = 0;
-        this.mpa = null;
-        this.likes = new LinkedHashSet<>();
+    public Film(String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = new Rating(mpaId);
         this.genres = new LinkedHashSet<>();
     }
 
@@ -62,7 +56,6 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = new Rating(mpaId);
-        this.likes = new LinkedHashSet<>();
         this.genres = new LinkedHashSet<>();
     }
 
@@ -73,7 +66,6 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = null;
-        this.likes = new LinkedHashSet<>();
         this.genres = new LinkedHashSet<>();
     }
 

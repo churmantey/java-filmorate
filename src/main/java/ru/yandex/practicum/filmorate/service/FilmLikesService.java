@@ -10,6 +10,6 @@ public interface FilmLikesService {
 
     FilmDto removeLike(Integer filmId, Integer userId);
 
-    List<FilmDto> getTopRatedFilms(int count);
+    List<FilmDto> getPopular(int count);
 
 }

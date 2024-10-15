@@ -13,4 +13,6 @@ public interface UserStorage extends BaseStorage<User> {
 
     User removeUserFriend(Integer userId, Integer friendId);
 
+    List<User> getUserFriends(Integer userId);
+
 }

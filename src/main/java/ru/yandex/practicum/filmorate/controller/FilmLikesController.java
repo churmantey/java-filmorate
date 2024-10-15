@@ -20,7 +20,7 @@ public class FilmLikesController {
     @GetMapping("/popular")
     public List<FilmDto> getPopular(@RequestParam(defaultValue = "10") int count) {
         log.info("GET popular {}", count);
-        return filmLikesService.getTopRatedFilms(count);
+        return filmLikesService.getPopular(count);
     }
 
     //PUT /films/{id}/like/{userId}

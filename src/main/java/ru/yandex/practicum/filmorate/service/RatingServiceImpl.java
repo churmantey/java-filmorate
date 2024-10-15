@@ -14,12 +14,12 @@ public class RatingServiceImpl implements RatingService {
     private final RatingStorage ratingStorage;
 
     @Override
-    public List<Rating> getAllRatings() {
+    public List<Rating> getAllMpa() {
         return ratingStorage.getAllElements();
     }
 
     @Override
-    public Rating getRatingsById(Integer ratingId) {
+    public Rating getMpaById(Integer ratingId) {
         return ratingStorage.getElement(ratingId);
     }
 }

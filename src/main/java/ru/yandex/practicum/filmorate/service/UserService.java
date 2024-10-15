@@ -21,6 +21,4 @@ public interface UserService {
 
     UserDto getUserById(Integer userId);
 
-    List<UserDto> getMutualFriends(Integer userId, Integer otherUserId);
-
 }

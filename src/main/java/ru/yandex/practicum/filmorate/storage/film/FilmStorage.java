@@ -12,4 +12,5 @@ public interface FilmStorage extends BaseStorage<Film> {
     void addLike(Integer filmId, Integer userId);
 
     void removeLike(Integer filmId, Integer userId);
+
 }

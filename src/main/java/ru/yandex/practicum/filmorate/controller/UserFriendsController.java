@@ -41,9 +41,9 @@ public class UserFriendsController {
 
     //GET /users/{id}/friends/common/{otherId}
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<UserDto> getMutualFriends(@PathVariable Integer id,
+    public List<UserDto> getCommonFriends(@PathVariable Integer id,
                                           @PathVariable Integer otherId) {
         log.info("GET mutual friends of user {} and user {}", id, otherId);
-        return userFriendsService.getMutualFriends(id, otherId);
+        return userFriendsService.getCommonFriends(id, otherId);
     }
 }

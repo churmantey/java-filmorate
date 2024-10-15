@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface RatingService {
 
-    List<Rating> getAllRatings();
+    List<Rating> getAllMpa();
 
-    Rating getRatingsById(Integer ratingId);
+    Rating getMpaById(Integer ratingId);
 
 }

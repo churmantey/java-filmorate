@@ -15,7 +15,7 @@ import java.util.Set;
 @Repository
 public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage {
     private static final String tableName = "genres";
-    private static final String fields = "id, name, description";
+    private static final String fields = "id, name";
     private static final String FIND_ALL_GENRES_QUERY = "SELECT " + fields + " FROM " + tableName;
     private static final String FIND_GENRE_QUERY = FIND_ALL_GENRES_QUERY + " WHERE id = ?";
 
@@ -24,8 +24,7 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
             " (film_id, genre_id) VALUES (?, ?)";
     private static final String FIND_FILM_GENRES_QUERY = """
             SELECT g.id,
-                g.name,
-                g.description
+                g.name
             FROM film_genres
             LEFT JOIN genres g ON genre_id = g.id
             WHERE film_id = ?

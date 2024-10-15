@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface UserFriendsService {
 
-    List<UserDto> getMutualFriends(Integer userId, Integer otherUserId);
+    List<UserDto> getCommonFriends(Integer userId, Integer otherUserId);
 
     List<UserDto> getUserFriends(Integer userId);
 

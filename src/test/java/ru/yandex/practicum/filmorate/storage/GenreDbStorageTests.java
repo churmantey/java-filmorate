@@ -65,9 +65,9 @@ public class GenreDbStorageTests {
     @Test
     public void testUpdateFilmGenresById() {
         LinkedHashSet<Genre> genreList = new LinkedHashSet<>(
-                Set.of(new Genre(1, "Комедия", ""),
-                        new Genre(3, "Мультфильм", ""),
-                        new Genre(6, "Боевик", ""))
+                Set.of(new Genre(1, "Комедия"),
+                        new Genre(3, "Мультфильм"),
+                        new Genre(6, "Боевик"))
         );
         assertThat(genreStorage.getFilmGenresById(3)).hasSize(0);
         genreStorage.updateFilmGenresById(3, genreList);

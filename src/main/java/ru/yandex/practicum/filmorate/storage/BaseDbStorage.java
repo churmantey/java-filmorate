@@ -55,6 +55,10 @@ public class BaseDbStorage<T> {
         }
     }
 
+    protected void updateNoCheck(String query, Object... params) {
+        jdbc.update(query, params);
+    }
+
     protected Integer insert(String query, Object... params) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(connection -> {

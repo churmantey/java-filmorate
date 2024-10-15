@@ -11,14 +11,13 @@ import ru.yandex.practicum.filmorate.model.Film;
 public final class FilmMapper {
 
     public static Film mapToFilm(NewFilmRequest request) {
-        Film film = new Film();
-        film.setName(request.getName());
-        film.setDescription(request.getDescription());
-        film.setReleaseDate(request.getReleaseDate());
-        film.setDuration(request.getDuration());
-        if (request.getMpa() != null) {
-            film.setMpa(request.getMpa());
-        }
+        Film film = new Film(
+                request.getName(),
+                request.getDescription(),
+                request.getReleaseDate(),
+                request.getDuration(),
+                request.getMpa().getId()
+        );
         if (request.getGenres() != null) {
             film.getGenres().addAll(request.getGenres());
         }
@@ -38,13 +37,13 @@ public final class FilmMapper {
         filmDto.setDescription(film.getDescription());
         filmDto.setReleaseDate(film.getReleaseDate());
         filmDto.setDuration(film.getDuration());
-        if (film.getLikes() != null) {
-            filmDto.getLikes().addAll(
-                    film.getLikes().stream()
-                            .map(user -> new IdEntity(user.getId(), user.getName()))
-                            .toList()
-            );
-        }
+//        if (film.getLikes() != null) {
+//            filmDto.getLikes().addAll(
+//                    film.getLikes().stream()
+//                            .map(user -> new IdEntity(user.getId(), user.getName()))
+//                            .toList()
+//            );
+//        }
         if (film.getMpa() != null) {
             filmDto.setMpa(new IdEntity(film.getMpa().getId(), film.getMpa().getName()));
         }

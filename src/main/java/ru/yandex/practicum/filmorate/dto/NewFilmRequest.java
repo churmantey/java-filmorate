@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +8,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -25,6 +22,7 @@ public class NewFilmRequest {
     private LocalDate releaseDate;
     @Positive
     private Integer duration;
+    @NotNull
     private Rating mpa;
-    private List<Genre> genres;
+    private Set<Genre> genres;
 }

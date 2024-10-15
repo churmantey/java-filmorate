@@ -72,17 +72,13 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public List<User> getAllElements() {
-        List<User> baseList = findMany(FIND_ALL_QUERY);
-        baseList.forEach(this::setUserFriends);
-        return baseList;
+        return findMany(FIND_ALL_QUERY);
     }
 
     @Override
     public User getElement(Integer id) {
-        User user = findOne(FIND_BY_ID_QUERY, id)
+        return findOne(FIND_BY_ID_QUERY, id)
                 .orElseThrow(() -> new NotFoundException("Не найден пользователь с id = " + id));
-        setUserFriends(user);
-        return user;
     }
 
     @Override
@@ -91,15 +87,6 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
         return delete(DELETE_QUERY, id);
     }
 
-    // Заполняет коллекцию друзей в объекте user
-    private void setUserFriends(User user) {
-        user.getFriends()
-                .addAll(
-                        findMany(FIND_FRIENDS_QUERY, user.getId())
-                );
-    }
-
-    //
     private void deleteFriendsAndLikes(Integer userId) {
         delete(DELETE_FRIENDS_QUERY, userId, userId);
         delete(DELETE_LIKES_QUERY, userId);
@@ -107,9 +94,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public List<User> getMutualFriends(Integer userId, Integer otherUserId) {
-        List<User> baseList = findMany(FIND_MUTUAL_FRIENDS_QUERY, userId, otherUserId);
-        baseList.forEach(this::setUserFriends);
-        return baseList;
+        return findMany(FIND_MUTUAL_FRIENDS_QUERY, userId, otherUserId);
     }
 
     @Override
@@ -120,7 +105,12 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public User removeUserFriend(Integer userId, Integer friendId) {
-        update(REMOVE_USER_FRIEND_QUERY, userId, friendId);
+        updateNoCheck(REMOVE_USER_FRIEND_QUERY, userId, friendId);
         return getElement(userId);
+    }
+
+    @Override
+    public List<User> getUserFriends(Integer userId) {
+        return findMany(FIND_FRIENDS_QUERY, userId);
     }
 }
