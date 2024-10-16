@@ -2,7 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.dto.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 
@@ -10,42 +13,40 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserFriendsServiceImpl implements UserFriendsService {
 
-    private final UserService userService;
+    private final UserStorage userStorage;
 
     @Override
-    public List<User> getMutualFriends(Integer userId, Integer otherUserId) {
-        User user = userService.getUserById(userId);
-        User otherUser = userService.getUserById(otherUserId);
-        return user.getFriends().stream()
-                .filter(friendId -> (otherUser.getFriends().contains(friendId)))
-                .map(userService::getUserById)
+    public List<UserDto> getCommonFriends(Integer userId, Integer otherUserId) {
+        List<User> uLst = userStorage.getMutualFriends(userId, otherUserId);
+        return uLst.stream()
+                .map(UserMapper::mapToUserDto)
                 .toList();
     }
 
     @Override
-    public List<User> getUserFriends(Integer userId) {
-        User user = userService.getUserById(userId);
-        return user.getFriends().stream()
-                .map(userService::getUserById)
+    public List<UserDto> getUserFriends(Integer userId) {
+        User user = userStorage.getElement(userId);
+        return userStorage.getUserFriends(userId).stream()
+                .map(UserMapper::mapToUserDto)
                 .toList();
     }
 
     @Override
-    public User addFriend(Integer userId, Integer friendId) {
-        User user = userService.getUserById(userId);
-        User friend = userService.getUserById(friendId);
-        user.getFriends().add(friend.getId());
-        friend.getFriends().add(user.getId());
-        return user;
+    public UserDto addFriend(Integer userId, Integer friendId) {
+        User user = userStorage.getElement(userId);
+        User friend = userStorage.getElement(friendId);
+
+        return UserMapper.mapToUserDto(
+                userStorage.addUserFriend(userId, friendId)
+        );
     }
 
     @Override
-    public User removeFriend(Integer userId, Integer friendId) {
-        User user = userService.getUserById(userId);
-        User friend = userService.getUserById(friendId);
-        user.getFriends().remove(friend.getId());
-        friend.getFriends().remove(user.getId());
-        return user;
+    public UserDto removeFriend(Integer userId, Integer friendId) {
+        User user = userStorage.getElement(userId);
+        User friend = userStorage.getElement(friendId);
+        userStorage.removeUserFriend(userId, friendId);
+        return UserMapper.mapToUserDto(user);
     }
 
 }

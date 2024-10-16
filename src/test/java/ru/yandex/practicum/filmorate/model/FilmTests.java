@@ -27,6 +27,7 @@ public class FilmTests {
                 "Test film description",
                 LocalDate.of(1970, 12, 1),
                 50);
+        film.setMpa(new Rating(1, "G", ""));
     }
 
     //    название не может быть пустым;

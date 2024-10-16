@@ -6,7 +6,7 @@ public interface BaseStorage<T> {
 
     T addElement(T element);
 
-    T deleteElement(T element);
+    boolean deleteElement(T element);
 
     T updateElement(T newElement);
 
@@ -14,6 +14,6 @@ public interface BaseStorage<T> {
 
     T getElement(Integer id);
 
-    T deleteElementById(Integer id);
+    boolean deleteElementById(Integer id);
 
 }

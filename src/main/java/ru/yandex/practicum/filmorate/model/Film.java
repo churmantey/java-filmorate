@@ -1,15 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -36,7 +34,30 @@ public class Film {
     @Positive
     private Integer duration;
 
-    private final Set<Integer> likes;
+    @NotNull
+    private Rating mpa;
+
+    @Getter
+    private final Set<Genre> genres;
+
+    public Film(String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = new Rating(mpaId);
+        this.genres = new LinkedHashSet<>();
+    }
+
+    public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = new Rating(mpaId);
+        this.genres = new LinkedHashSet<>();
+    }
 
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration) {
         this.id = id;
@@ -44,7 +65,8 @@ public class Film {
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.likes = new HashSet<>();
+        this.mpa = null;
+        this.genres = new LinkedHashSet<>();
     }
 
     public void validate() {
