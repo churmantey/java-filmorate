@@ -23,12 +23,6 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
 
-    //private final Set<User> friends;
-
-//    public User() {
-//        this.friends = new HashSet<>();
-//    }
-
     public User(String login, String name, String email, LocalDate birthday) {
         this.login = login;
         this.name = name;
@@ -37,7 +31,6 @@ public class User {
         if (this.name == null || this.name.isBlank()) {
             this.name = this.login;
         }
-//        this.friends = new HashSet<>();
     }
 
     public User(Integer id, String login, String name, String email, LocalDate birthday) {
@@ -49,6 +42,5 @@ public class User {
         if (this.name == null || this.name.isBlank()) {
             this.name = this.login;
         }
-//        this.friends = new HashSet<>();
     }
 }

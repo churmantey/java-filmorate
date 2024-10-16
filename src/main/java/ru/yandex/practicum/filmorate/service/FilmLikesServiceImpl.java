@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
@@ -12,7 +12,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FilmLikesServiceImpl implements FilmLikesService {
 
     private final FilmStorage filmStorage;
@@ -30,9 +30,7 @@ public class FilmLikesServiceImpl implements FilmLikesService {
     public FilmDto removeLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getElement(filmId);
         User user = userStorage.getElement(userId);
-//        if (film.getLikes().contains(user)) {
         filmStorage.removeLike(filmId, userId);
-//        }
         return FilmMapper.mapToFilmDto(
                 filmStorage.getElement(filmId)
         );
