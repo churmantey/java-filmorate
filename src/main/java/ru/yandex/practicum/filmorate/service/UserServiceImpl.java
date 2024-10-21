@@ -2,6 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.NewUserRequest;
+import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.dto.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -14,10 +18,9 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
-    private final IdGenerator idGenerator;
 
     @Override
-    public User getUserById(Integer userId) {
+    public UserDto getUserById(Integer userId) {
         if (userId == null) {
             throw new NullObjectException("Передан id пользователя null");
         }
@@ -25,32 +28,39 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new NotFoundException("Не найден пользователь с id = " + userId);
         }
-        return user;
+        return UserMapper.mapToUserDto(user);
     }
 
     @Override
-    public User createUser(User user) {
-        user.setId(idGenerator.getNextId());
-        return userStorage.addElement(user);
+    public UserDto createUser(NewUserRequest newUserRequest) {
+        User user = UserMapper.mapToUser(newUserRequest);
+        return UserMapper.mapToUserDto(
+                userStorage.addElement(user)
+        );
     }
 
     @Override
-    public User updateUser(User user) {
-        return userStorage.updateElement(user);
+    public UserDto updateUser(UpdateUserRequest updateUserRequest) {
+        User newUser = UserMapper.mapToUser(updateUserRequest);
+        User user = userStorage.getElement(newUser.getId());
+        return UserMapper.mapToUserDto(userStorage.updateElement(newUser));
     }
 
     @Override
-    public User deleteUser(User user) {
+    public boolean deleteUser(User user) {
         return userStorage.deleteElement(user);
     }
 
     @Override
-    public User deleteUserById(Integer id) {
+    public boolean deleteUserById(Integer id) {
         return userStorage.deleteElementById(id);
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userStorage.getAllElements();
+    public List<UserDto> getAllUsers() {
+        return userStorage.getAllElements().stream()
+                .map(UserMapper::mapToUserDto)
+                .toList();
     }
+
 }
