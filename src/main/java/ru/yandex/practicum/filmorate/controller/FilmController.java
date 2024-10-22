@@ -31,7 +31,6 @@ public class FilmController {
         return filmService.getFilmById(filmId);
     }
 
-
     @PostMapping
     public FilmDto create(@Valid @RequestBody NewFilmRequest newFilmRequest) {
         log.info("POST film {}", newFilmRequest);
@@ -44,4 +43,10 @@ public class FilmController {
         return filmService.updateFilm(updateFilmRequest);
     }
 
+    @DeleteMapping("/{filmId}")
+    public boolean delete(@PathVariable Integer filmId) {
+        log.info("DELETE film {}", filmId);
+        FilmDto film = filmService.getFilmById(filmId);
+        return filmService.deleteFilmById(film.getId());
+    }
 }
