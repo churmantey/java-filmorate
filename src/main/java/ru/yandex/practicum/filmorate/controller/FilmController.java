@@ -22,13 +22,17 @@ public class FilmController {
     @GetMapping
     public List<FilmDto> getAllFilms() {
         log.info("GET films");
-        return filmService.getAllFilms();
+        List<FilmDto> filmList = filmService.getAllFilms();
+        log.info("GET films RESPONSE {}", filmList);
+        return filmList;
     }
 
     @GetMapping("/{filmId}")
     public FilmDto getFilm(@PathVariable Integer filmId) {
         log.info("GET film {}", filmId);
-        return filmService.getFilmById(filmId);
+        FilmDto filmDto = filmService.getFilmById(filmId);
+        log.info("GET film RESPONSE {}", filmDto);
+        return  filmDto;
     }
 
     @PostMapping

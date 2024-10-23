@@ -22,13 +22,17 @@ public class UserController {
     @GetMapping
     public List<UserDto> getAllUsers() {
         log.info("GET users");
-        return userService.getAllUsers();
+        List<UserDto> userList = userService.getAllUsers();
+        log.info("GET users RESPONSE {}", userList);
+        return userList;
     }
 
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable Integer userId) {
         log.info("GET user {}", userId);
-        return userService.getUserById(userId);
+        UserDto user = userService.getUserById(userId);
+        log.info("GET user RESPONSE {}", user);
+        return user;
     }
 
     @PostMapping
