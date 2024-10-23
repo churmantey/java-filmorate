@@ -35,6 +35,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String REMOVE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
     private static final String FIND_LIKES_QUERY = "SELECT user_id FROM film_likes WHERE film_id = ? ORDER BY user_id";
     private static final String DELETE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ?";
+    private static final String FIND_FILMS_BY_USER_LIKES_QUERY = "SELECT film_id FROM film_likes WHERE user_id = ? ORDER BY film_id";
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
 
@@ -108,6 +109,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         update(REMOVE_LIKES_QUERY, filmId, userId);
     }
 
+    @Override
     public List<Integer> getFilmLikes(Integer filmId) {
         return retrieveIdList(FIND_LIKES_QUERY, filmId);
     }
@@ -142,6 +144,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private void deleteFilmLikesAndGenres(Integer filmId) {
         genreStorage.deleteFilmGenresById(filmId);
         delete(DELETE_LIKES_QUERY, filmId);
+    }
+
+    @Override
+    public List<Integer> getFilmsLikesByUsers(Integer userId) {
+        return retrieveIdList(FIND_FILMS_BY_USER_LIKES_QUERY, userId);
     }
 
 }

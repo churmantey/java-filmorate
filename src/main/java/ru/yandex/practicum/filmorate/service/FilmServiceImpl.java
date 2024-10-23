@@ -96,4 +96,17 @@ public class FilmServiceImpl implements FilmService {
             }
         }
     }
+
+    public List<FilmDto> getCommonFilmsLikesByUsers(Integer userId, Integer friendId) {
+        List<Integer> filmsIds = filmStorage.getFilmsLikesByUsers(userId);
+        filmsIds.retainAll(filmStorage.getFilmsLikesByUsers(friendId)); //оставляем в filmsIds общие id фильмов
+        List<FilmDto> films = new java.util.ArrayList<>(filmsIds.stream()
+                .map(this::getFilmById)
+                .toList());
+        films.sort((FilmDto film1, FilmDto film2) -> //сортировка фильмов по количеству лайков по убыванию
+                Integer.compare(filmStorage.getFilmLikes(film2.getId()).size(), filmStorage.getFilmLikes(film1.getId()).size())
+        );
+        return films;
+    }
+
 }

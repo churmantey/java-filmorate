@@ -31,7 +31,6 @@ public class FilmController {
         return filmService.getFilmById(filmId);
     }
 
-
     @PostMapping
     public FilmDto create(@Valid @RequestBody NewFilmRequest newFilmRequest) {
         log.info("POST film {}", newFilmRequest);
@@ -44,4 +43,11 @@ public class FilmController {
         return filmService.updateFilm(updateFilmRequest);
     }
 
+    @GetMapping("/common")
+    public List<FilmDto> getCommonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) {
+        log.info("GET commonFilms from userId {}, friendId {}", userId, friendId);
+        List<FilmDto> commonFilms = filmService.getCommonFilmsLikesByUsers(userId, friendId);
+        log.info("GET commonFilms films {}", commonFilms);
+        return commonFilms;
+    }
 }
