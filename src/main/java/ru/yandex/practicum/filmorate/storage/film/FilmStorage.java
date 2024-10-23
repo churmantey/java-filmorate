@@ -13,4 +13,7 @@ public interface FilmStorage extends BaseStorage<Film> {
 
     void removeLike(Integer filmId, Integer userId);
 
+    List<Film> getSortedFilmsByYear(Integer id);
+
+    List<Film> getSortedFilmsByLikes(Integer id);
 }

@@ -40,6 +40,8 @@ public class Film {
     @Getter
     private final Set<Genre> genres;
 
+    private Set<Director> directors;
+
     public Film(String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
         this.name = name;
         this.description = description;

@@ -21,12 +21,18 @@ public final class FilmMapper {
         if (request.getGenres() != null) {
             film.getGenres().addAll(request.getGenres());
         }
+
+        if (request.getDirectors() != null) {
+            film.setDirectors(request.getDirectors());
+        }
+
         return film;
     }
 
     public static Film mapToFilm(UpdateFilmRequest request) {
         Film film = mapToFilm((NewFilmRequest) request);
         film.setId(request.getId());
+        film.setDirectors(request.getDirectors());
         return film;
     }
 
@@ -52,6 +58,10 @@ public final class FilmMapper {
                     film.getGenres().stream()
                             .map(genre -> new IdEntity(genre.getId(), genre.getName()))
                             .toList());
+        }
+
+        if (film.getDirectors() != null) {
+            filmDto.setDirectors(film.getDirectors());
         }
         return filmDto;
     }

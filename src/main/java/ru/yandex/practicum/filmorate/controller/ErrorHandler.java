@@ -14,19 +14,19 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse(e.getMessage(), "Not found");
     }
 
     @ExceptionHandler({NullObjectException.class, ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNullObjectException(final RuntimeException e) {
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse(e.getMessage(), "Bad request");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleOtherException(final RuntimeException e) {
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse(e.getMessage(), "Internal server error");
     }
 
 }
