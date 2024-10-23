@@ -80,7 +80,7 @@ public class DirectorDbStorage extends BaseDbStorage<Director> implements Direct
     }
 
     @Override
-    public void insertFilmAndDirectors(Integer film_id, Set<Integer> directorIds) {
+    public void insertFilmAndDirectors(Integer filmId, Set<Integer> directorIds) {
         jdbcTemplate.batchUpdate(
                 MERGE_QUERY,
 
@@ -90,7 +90,7 @@ public class DirectorDbStorage extends BaseDbStorage<Director> implements Direct
 
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        ps.setInt(1, film_id);
+                        ps.setInt(1, filmId);
                         ps.setInt(2, directorIdsList.get(i));
                     }
 

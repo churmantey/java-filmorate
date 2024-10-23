@@ -11,7 +11,7 @@ public interface DirectorStorage extends BaseStorage<Director> {
 
     Set<Integer> getDirectorIdsOfFilm(Integer id);
 
-    void insertFilmAndDirectors(Integer film_id, Set<Integer> directorIds);
+    void insertFilmAndDirectors(Integer filmId, Set<Integer> directorIds);
 
     List<Director> getDirectorsByFilmId(Integer id);
 }
