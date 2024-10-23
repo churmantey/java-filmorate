@@ -22,15 +22,18 @@ public class FilmController {
     @GetMapping
     public List<FilmDto> getAllFilms() {
         log.info("GET films");
-        return filmService.getAllFilms();
+        List<FilmDto> filmList = filmService.getAllFilms();
+        log.info("GET films RESPONSE {}", filmList);
+        return filmList;
     }
 
     @GetMapping("/{filmId}")
     public FilmDto getFilm(@PathVariable Integer filmId) {
         log.info("GET film {}", filmId);
-        return filmService.getFilmById(filmId);
+        FilmDto filmDto = filmService.getFilmById(filmId);
+        log.info("GET film RESPONSE {}", filmDto);
+        return  filmDto;
     }
-
 
     @PostMapping
     public FilmDto create(@Valid @RequestBody NewFilmRequest newFilmRequest) {
@@ -44,4 +47,10 @@ public class FilmController {
         return filmService.updateFilm(updateFilmRequest);
     }
 
+    @DeleteMapping("/{filmId}")
+    public boolean delete(@PathVariable Integer filmId) {
+        log.info("DELETE film {}", filmId);
+        FilmDto film = filmService.getFilmById(filmId);
+        return filmService.deleteFilmById(film.getId());
+    }
 }
