@@ -20,11 +20,12 @@ public class FilmDto {
     private IdEntity mpa;
     private final Set<IdEntity> likes;
     private final Set<IdEntity> genres;
-    private Set<Director> directors;
+    private final Set<Director> directors;
 
     public FilmDto() {
         this.likes = new LinkedHashSet<>();
         this.genres = new LinkedHashSet<>();
+        this.directors = new LinkedHashSet<>();
     }
 
 }

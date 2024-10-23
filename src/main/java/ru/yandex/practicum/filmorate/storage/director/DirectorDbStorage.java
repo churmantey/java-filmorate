@@ -25,7 +25,7 @@ public class DirectorDbStorage extends BaseDbStorage<Director> implements Direct
     private static final String GET_DIRECTORS_BY_ID = "SELECT * FROM directors WHERE id in (%S)";
     private static final String GET_DIRECTORS_IDS = "SELECT director_id FROM films_directors WHERE film_id = ?";
     private static final String MERGE_QUERY = "MERGE INTO films_directors KEY(film_id, director_id) VALUES(?, ?)";
-    private static final String GET_DIRECTORS_FOR_ONE_FILM = "SELECT * FROM DIRECTORS d WHERE id IN " +
+    private static final String GET_DIRECTORS_FOR_ONE_FILM = "SELECT * FROM DIRECTORS WHERE id IN " +
             "(SELECT director_id FROM FILMS_DIRECTORS fd WHERE film_id = ?)";
 
     public DirectorDbStorage(JdbcTemplate jdbcTemplate, RowMapper<Director> mapper) {

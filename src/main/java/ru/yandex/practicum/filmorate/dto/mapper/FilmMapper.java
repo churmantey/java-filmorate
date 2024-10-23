@@ -23,7 +23,7 @@ public final class FilmMapper {
         }
 
         if (request.getDirectors() != null) {
-            film.setDirectors(request.getDirectors());
+            film.getDirectors().addAll(request.getDirectors());
         }
 
         return film;
@@ -32,7 +32,6 @@ public final class FilmMapper {
     public static Film mapToFilm(UpdateFilmRequest request) {
         Film film = mapToFilm((NewFilmRequest) request);
         film.setId(request.getId());
-        film.setDirectors(request.getDirectors());
         return film;
     }
 
@@ -61,7 +60,7 @@ public final class FilmMapper {
         }
 
         if (film.getDirectors() != null) {
-            filmDto.setDirectors(film.getDirectors());
+            filmDto.getDirectors().addAll(film.getDirectors());
         }
         return filmDto;
     }
