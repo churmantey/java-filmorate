@@ -52,8 +52,8 @@ public class DirectorServiceImpl implements DirectorService {
     }
 
     @Override
-    public void insertFilmAndDirector(Integer film_id, Set<Integer> directorIds) {
-        directorStorage.insertFilmAndDirectors(film_id, directorIds);
+    public void insertFilmAndDirector(Integer filmId, Set<Integer> directorIds) {
+        directorStorage.insertFilmAndDirectors(filmId, directorIds);
     }
 
     @Override

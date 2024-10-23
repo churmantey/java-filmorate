@@ -22,7 +22,7 @@ public interface DirectorService {
 
     Set<Integer> getDirectorsIdsOfFilm(Integer id);
 
-    void insertFilmAndDirector(Integer film_id, Set<Integer> directorIds);
+    void insertFilmAndDirector(Integer filmId, Set<Integer> directorIds);
 
 }
 
