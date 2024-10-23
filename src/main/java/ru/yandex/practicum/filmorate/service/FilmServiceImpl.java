@@ -149,4 +149,10 @@ public class FilmServiceImpl implements FilmService {
         }
         return new LinkedHashSet<>();
     }
+
+    public List<FilmDto> getCommonFilmsLikesByUsers(Integer userId, Integer friendId) {
+        return filmStorage.getFilmsLikesByUsers(userId, friendId).stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
 }

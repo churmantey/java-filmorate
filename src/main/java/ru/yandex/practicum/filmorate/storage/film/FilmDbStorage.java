@@ -46,6 +46,10 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "GROUP BY fd.film_id " +
             "ORDER BY COUNT(fl.user_id) DESC)";
 
+    private static final String FIND_FILMS_BY_USER_LIKES_QUERY = "SELECT fl.film_id FROM film_likes AS fl " +
+            "JOIN (SELECT film_id, COUNT(user_id) AS cou FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
+            "WHERE fl.user_id = ? ORDER BY gro.cou DESC";
+
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
 
@@ -69,6 +73,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         );
         film.setId(newId);
         film.setMpa(ratingStorage.getElement(film.getMpa().getId()));
+
         addFilmAndGenres(film);
 
         return film;
@@ -166,6 +171,13 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private void deleteFilmLikesAndGenres(Integer filmId) {
         genreStorage.deleteFilmGenresById(filmId);
         delete(DELETE_LIKES_QUERY, filmId);
+    }
+
+    @Override
+    public List<Film> getFilmsLikesByUsers(Integer userId, Integer friendId) {
+        List<Integer> filmsIds = retrieveIdList(FIND_FILMS_BY_USER_LIKES_QUERY, userId);
+        filmsIds.retainAll(retrieveIdList(FIND_FILMS_BY_USER_LIKES_QUERY, friendId)); //оставляем в filmsIds общие id фильмов
+        return filmsIds.stream().map(this::getElement).toList();
     }
 
 }
