@@ -47,18 +47,18 @@ public class FilmController {
         return filmService.updateFilm(updateFilmRequest);
     }
 
+    @DeleteMapping("/{filmId}")
+    public boolean delete(@PathVariable Integer filmId) {
+        log.info("DELETE film {}", filmId);
+        FilmDto film = filmService.getFilmById(filmId);
+        return filmService.deleteFilmById(film.getId());
+    }
+
     @GetMapping("/common")
     public List<FilmDto> getCommonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) {
         log.info("GET commonFilms from userId {}, friendId {}", userId, friendId);
         List<FilmDto> commonFilms = filmService.getCommonFilmsLikesByUsers(userId, friendId);
         log.info("GET commonFilms films {}", commonFilms);
         return commonFilms;
-  
-    @DeleteMapping("/{filmId}")
-    public boolean delete(@PathVariable Integer filmId) {
-        log.info("DELETE film {}", filmId);
-        FilmDto film = filmService.getFilmById(filmId);
-        return filmService.deleteFilmById(film.getId());
-
     }
 }
