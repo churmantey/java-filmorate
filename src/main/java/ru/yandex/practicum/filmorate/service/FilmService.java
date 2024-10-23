@@ -20,4 +20,6 @@ public interface FilmService {
     boolean deleteFilmById(Integer id);
 
     List<FilmDto> getAllFilms();
+
+    List<FilmDto> getCommonFilmsLikesByUsers(Integer userId, Integer friendId);
 }

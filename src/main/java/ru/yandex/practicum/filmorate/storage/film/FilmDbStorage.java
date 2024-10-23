@@ -35,6 +35,10 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String REMOVE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
     private static final String FIND_LIKES_QUERY = "SELECT user_id FROM film_likes WHERE film_id = ? ORDER BY user_id";
     private static final String DELETE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ?";
+    private static final String FIND_FILMS_BY_USER_LIKES_QUERY = "SELECT fl.film_id FROM film_likes AS fl " +
+            "JOIN (SELECT film_id, COUNT(user_id) AS cou FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
+            "WHERE fl.user_id = ? ORDER BY gro.cou DESC";
+
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
 
@@ -108,6 +112,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         update(REMOVE_LIKES_QUERY, filmId, userId);
     }
 
+    @Override
     public List<Integer> getFilmLikes(Integer filmId) {
         return retrieveIdList(FIND_LIKES_QUERY, filmId);
     }
@@ -142,6 +147,13 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private void deleteFilmLikesAndGenres(Integer filmId) {
         genreStorage.deleteFilmGenresById(filmId);
         delete(DELETE_LIKES_QUERY, filmId);
+    }
+
+    @Override
+    public List<Film> getFilmsLikesByUsers(Integer userId, Integer friendId) {
+        List<Integer> filmsIds = retrieveIdList(FIND_FILMS_BY_USER_LIKES_QUERY, userId);
+        filmsIds.retainAll(retrieveIdList(FIND_FILMS_BY_USER_LIKES_QUERY, friendId)); //оставляем в filmsIds общие id фильмов
+        return filmsIds.stream().map(this::getElement).toList();
     }
 
 }
