@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
+import ru.yandex.practicum.filmorate.dto.SearchParams;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -17,10 +18,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -155,4 +153,14 @@ public class FilmServiceImpl implements FilmService {
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
+
+    @Override
+    public List<FilmDto> getFilmsByContext(String query, String criterion) {
+        SearchParams searchParams = new SearchParams(query, criterion);
+        return filmStorage.getByContext(searchParams).stream()
+                .map(FilmMapper::mapToFilmDto)
+                .sorted(Comparator.comparing(FilmDto::getName))
+                .toList();
+    }
+
 }

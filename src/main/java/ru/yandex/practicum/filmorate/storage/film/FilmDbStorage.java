@@ -1,17 +1,21 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dto.SearchParams;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 
-import java.util.List;
+import java.util.*;
 
+@Slf4j
 @Repository
 @Qualifier("filmDbStorage")
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
@@ -50,16 +54,26 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "JOIN (SELECT film_id, COUNT(user_id) AS cou FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
             "WHERE fl.user_id = ? ORDER BY gro.cou DESC";
 
+    private static final String FIND_ALL_BY_NAME_CONTEXT = "SELECT id FROM " + tableName +
+            " WHERE LOCATE(?, title) > 0 ";
+    private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT id FROM " + tableName +
+            " WHERE films.id IN " + "(SELECT fd.film_id FROM films_directors AS fd WHERE fd.director_id IN " +
+            "(SELECT d.id FROM directors AS d WHERE LOCATE(?, d.name) > 0)) ";
+
+
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
+    private final DirectorStorage directorStorage;
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate,
                          RowMapper<Film> mapper,
                          GenreStorage genreStorage,
-                         RatingStorage ratingStorage) {
+                         RatingStorage ratingStorage,
+                         DirectorStorage directorStorage) {
         super(jdbcTemplate, mapper);
         this.genreStorage = genreStorage;
         this.ratingStorage = ratingStorage;
+        this.directorStorage = directorStorage;
     }
 
     @Override
@@ -130,7 +144,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public List<Film> getAllElements() {
         List<Film> baseList = findMany(FIND_ALL_QUERY);
-        baseList.forEach(this::setFilmMpaAndGenres);
+        baseList.forEach(this::setFilmMpaAndGenresAndDirectors);
         return baseList;
     }
 
@@ -138,28 +152,29 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     public Film getElement(Integer id) {
         Film film = findOne(FIND_BY_ID_QUERY, id)
                 .orElseThrow(() -> new NotFoundException("Не найден фильм с id = " + id));
-        setFilmMpaAndGenres(film);
+        setFilmMpaAndGenresAndDirectors(film);
         return film;
     }
 
     @Override
     public List<Film> getSortedFilmsByYear(Integer id) {
         List<Film> films = findMany(GET_SORTED_FILMS_BY_YEAR, id);
-        films.forEach(this::setFilmMpaAndGenres);
+        films.forEach(this::setFilmMpaAndGenresAndDirectors);
         return films;
     }
 
     @Override
     public List<Film> getSortedFilmsByLikes(Integer id) {
         List<Film> films = findMany(GET_SORTED_FILMS_BY_LIKES, id);
-        films.forEach(this::setFilmMpaAndGenres);
+        films.forEach(this::setFilmMpaAndGenresAndDirectors);
         return films;
     }
 
     // заполняет коллекции жанров в фильме по данным из БД
-    private void setFilmMpaAndGenres(Film film) {
+    private void setFilmMpaAndGenresAndDirectors(Film film) {
         film.setMpa(ratingStorage.getElement(film.getMpa().getId()));
         film.getGenres().addAll(genreStorage.getFilmGenresById(film.getId()));
+        film.getDirectors().addAll(directorStorage.getDirectorsByFilmId(film.getId()));
     }
 
     //добавляет жанры фильма в БД
@@ -178,6 +193,22 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         List<Integer> filmsIds = retrieveIdList(FIND_FILMS_BY_USER_LIKES_QUERY, userId);
         filmsIds.retainAll(retrieveIdList(FIND_FILMS_BY_USER_LIKES_QUERY, friendId)); //оставляем в filmsIds общие id фильмов
         return filmsIds.stream().map(this::getElement).toList();
+    }
+
+    public List<Film> getByContext(SearchParams searchParams) {
+        Set<Integer> filmIds = new LinkedHashSet<>();
+        log.info("SearchParams {}", searchParams);
+        if (searchParams.isNeedTitle()) {
+            filmIds.addAll(retrieveIdList(FIND_ALL_BY_NAME_CONTEXT, searchParams.getQuery()));
+        }
+        if (searchParams.isNeedDirector()) {
+            filmIds.addAll(retrieveIdList(FIND_ALL_BY_DIRECTOR_CONTEXT, searchParams.getQuery()));
+        }
+        List<Film> baseList = filmIds.stream()
+                .map(this::getElement)
+                .toList();
+        baseList.forEach(this::setFilmMpaAndGenresAndDirectors);
+        return baseList;
     }
 
 }
