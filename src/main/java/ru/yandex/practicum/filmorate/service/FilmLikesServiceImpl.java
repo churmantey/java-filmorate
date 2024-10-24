@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
@@ -47,18 +46,20 @@ public class FilmLikesServiceImpl implements FilmLikesService {
     }
 
     @Override
-    public List<FilmDto> getPopularFilmsByYearAndGenre(Integer count, Integer genreId, Integer year) {
-        Genre genre;
-        if (genreId != null) {
-            genre = genreStorage.getElement(genreId);
-        } else {
-            genre = null;
-        }
-        return new java.util.ArrayList<>(filmStorage.getAllTopRatedFilms().stream()
-                .filter(film -> genre == null || film.getGenres().contains(genre))
-                .filter(film -> year == null || film.getReleaseDate().getYear() == year)
-                .limit(count)
-                .map(FilmMapper::mapToFilmDto)
-                .toList());
+    public List<FilmDto> getPopularFilmsByGenreAndYear(Integer genreId, Integer year, Integer count) {
+        return filmStorage.getPopularFilmsByGenreAndYear(genreId, year, count).stream()
+                .map(FilmMapper::mapToFilmDto).toList();
+    }
+
+    @Override
+    public List<FilmDto> getPopularFilmsByGenre(Integer genreId, Integer count) {
+        return filmStorage.getPopularFilmsByGenre(genreId, count).stream()
+                .map(FilmMapper::mapToFilmDto).toList();
+    }
+
+    @Override
+    public List<FilmDto> getPopularFilmsByYear(Integer year, Integer count) {
+        return filmStorage.getPopularFilmsByYear(year, count).stream()
+                .map(FilmMapper::mapToFilmDto).toList();
     }
 }

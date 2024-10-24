@@ -38,6 +38,16 @@ public class FilmLikesController {
                                                   @RequestParam(required = false) Integer genreId,
                                                   @RequestParam(required = false) Integer year) {
         log.info("GET first {} popular films by genre {} and year {}", count, genreId, year);
-        return filmLikesService.getPopularFilmsByYearAndGenre(count, genreId, year);
+        if (genreId == null && year == null) {
+            return filmLikesService.getPopular(count);
+        }
+        if (genreId != null && year == null) {
+            return filmLikesService.getPopularFilmsByGenre(genreId, count);
+        }
+        if (genreId == null && year != null) {
+            return filmLikesService.getPopularFilmsByYear(year, count);
+        }
+        return filmLikesService.getPopularFilmsByGenreAndYear(genreId, year, count);
+
     }
 }
