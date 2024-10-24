@@ -40,6 +40,8 @@ public class Film {
     @Getter
     private final Set<Genre> genres;
 
+    private final Set<Director> directors;
+
     public Film(String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
         this.name = name;
         this.description = description;
@@ -47,6 +49,7 @@ public class Film {
         this.duration = duration;
         this.mpa = new Rating(mpaId);
         this.genres = new LinkedHashSet<>();
+        this.directors = new LinkedHashSet<>();
     }
 
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
@@ -57,6 +60,7 @@ public class Film {
         this.duration = duration;
         this.mpa = new Rating(mpaId);
         this.genres = new LinkedHashSet<>();
+        this.directors = new LinkedHashSet<>();
     }
 
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration) {
@@ -67,6 +71,7 @@ public class Film {
         this.duration = duration;
         this.mpa = null;
         this.genres = new LinkedHashSet<>();
+        this.directors = new LinkedHashSet<>();
     }
 
     public void validate() {

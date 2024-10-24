@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -17,7 +18,10 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,7 @@ public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
     private final RatingStorage ratingStorage;
     private final GenreStorage genreStorage;
+    private final DirectorService directorService;
 
     @Override
     public FilmDto getFilmById(Integer filmId) {
@@ -36,6 +41,11 @@ public class FilmServiceImpl implements FilmService {
         if (film == null) {
             throw new NotFoundException("Не найден фильм с id = " + filmId);
         }
+
+        Set<Integer> directorsIds = directorService.getDirectorsIdsOfFilm(filmId);
+        List<Director> directors = directorService.getDirectorByIds(directorsIds);
+        film.getDirectors().addAll(new LinkedHashSet<>(directors));
+
         return FilmMapper.mapToFilmDto(film);
     }
 
@@ -43,20 +53,28 @@ public class FilmServiceImpl implements FilmService {
     public FilmDto createFilm(NewFilmRequest newFilmRequest) {
         validateRating(newFilmRequest.getMpa());
         validateGenres(newFilmRequest.getGenres());
+        Set<Integer> directorsIds = validateDirectors(newFilmRequest);
+
+
         Film film = FilmMapper.mapToFilm(newFilmRequest);
         film.validate();
-        return FilmMapper.mapToFilmDto(
-                filmStorage.addElement(film)
-        );
+        Film newFilm = filmStorage.addElement(film);
+
+        directorService.insertFilmAndDirector(newFilm.getId(), directorsIds);
+        return FilmMapper.mapToFilmDto(newFilm);
     }
 
     @Override
     public FilmDto updateFilm(UpdateFilmRequest updateFilmRequest) {
         validateRating(updateFilmRequest.getMpa());
         validateGenres(updateFilmRequest.getGenres());
+        Set<Integer> directorsIds = validateDirectors(updateFilmRequest);
+
         Film film = FilmMapper.mapToFilm(updateFilmRequest);
         film.validate();
         Film oldFilm = filmStorage.getElement(film.getId());
+        directorService.insertFilmAndDirector(film.getId(), directorsIds);
+
         return FilmMapper.mapToFilmDto(
                 filmStorage.updateElement(film)
         );
@@ -80,6 +98,26 @@ public class FilmServiceImpl implements FilmService {
                 .toList();
     }
 
+    @Override
+    public List<FilmDto> getSortedFilms(Integer directorId, String sort) {
+        List<Film> films;
+        if (sort.equalsIgnoreCase("year")) {
+            films = filmStorage.getSortedFilmsByYear(directorId);
+        } else if (sort.equalsIgnoreCase("likes")) {
+            films = filmStorage.getSortedFilmsByLikes(directorId);
+        } else {
+            throw new ValidationException("Введен некорректный фильтр сортировки");
+        }
+
+        System.out.println(films);
+        return films.stream()
+                .peek(film -> film.getDirectors()
+                        .addAll(new LinkedHashSet<>(directorService.getAllDirectorForOneFilm(film.getId())))
+                )
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
+
     private void validateRating(Rating rating) {
         if (rating == null
                 || !ratingStorage.isValidRatingId(rating.getId())) {
@@ -95,6 +133,21 @@ public class FilmServiceImpl implements FilmService {
                 }
             }
         }
+    }
+
+    private Set<Integer> validateDirectors(NewFilmRequest newFilmRequest) {
+        if (newFilmRequest.getDirectors() != null) {
+            Set<Integer> directorsIds = newFilmRequest.getDirectors().stream()
+                    .map(Director::getId)
+                    .collect(Collectors.toSet());
+            List<Director> directors = directorService.getDirectorByIds(directorsIds);
+            if (newFilmRequest.getDirectors().size() != directors.size()) {
+                throw new ValidationException("Введен некорректный режиссер");
+            }
+            newFilmRequest.setDirectors(new LinkedHashSet<>(directors));
+            return directorsIds;
+        }
+        return new LinkedHashSet<>();
     }
 
     public List<FilmDto> getCommonFilmsLikesByUsers(Integer userId, Integer friendId) {

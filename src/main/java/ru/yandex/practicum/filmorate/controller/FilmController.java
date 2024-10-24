@@ -35,6 +35,15 @@ public class FilmController {
         return  filmDto;
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<FilmDto> getFilmsByDirectorSorted(@PathVariable Integer directorId,
+                                                  @RequestParam(name = "sortBy") String sort) {
+        log.info("Пришел GET запрос /films/director/{} с сортировкой по {}", directorId, sort);
+        List<FilmDto> films = filmService.getSortedFilms(directorId, sort);
+        log.info("Отправлен GET ответ с телом {}", films);
+        return films;
+    }
+
     @PostMapping
     public FilmDto create(@Valid @RequestBody NewFilmRequest newFilmRequest) {
         log.info("POST film {}", newFilmRequest);

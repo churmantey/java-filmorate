@@ -35,6 +35,17 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String REMOVE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
     private static final String FIND_LIKES_QUERY = "SELECT user_id FROM film_likes WHERE film_id = ? ORDER BY user_id";
     private static final String DELETE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ?";
+    private static final String GET_SORTED_FILMS_BY_YEAR = "SELECT * FROM FILMS f " +
+            "WHERE id IN (SELECT film_id FROM FILMS_DIRECTORS fd WHERE director_id = ?) " +
+            "ORDER BY EXTRACT (YEAR FROM release_date);";
+    private static final String GET_SORTED_FILMS_BY_LIKES = "SELECT * FROM FILMS f WHERE id IN " +
+            "( SELECT fd.film_id " +
+            "FROM films_directors fd " +
+            "LEFT JOIN film_likes fl ON fd.film_id = fl.film_id " +
+            "WHERE fd.director_id = ? " +
+            "GROUP BY fd.film_id " +
+            "ORDER BY COUNT(fl.user_id) DESC)";
+
     private static final String FIND_FILMS_BY_USER_LIKES_QUERY = "SELECT fl.film_id FROM film_likes AS fl " +
             "JOIN (SELECT film_id, COUNT(user_id) AS cou FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
             "WHERE fl.user_id = ? ORDER BY gro.cou DESC";
@@ -112,7 +123,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         update(REMOVE_LIKES_QUERY, filmId, userId);
     }
 
-    @Override
     public List<Integer> getFilmLikes(Integer filmId) {
         return retrieveIdList(FIND_LIKES_QUERY, filmId);
     }
@@ -130,6 +140,20 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 .orElseThrow(() -> new NotFoundException("Не найден фильм с id = " + id));
         setFilmMpaAndGenres(film);
         return film;
+    }
+
+    @Override
+    public List<Film> getSortedFilmsByYear(Integer id) {
+        List<Film> films = findMany(GET_SORTED_FILMS_BY_YEAR, id);
+        films.forEach(this::setFilmMpaAndGenres);
+        return films;
+    }
+
+    @Override
+    public List<Film> getSortedFilmsByLikes(Integer id) {
+        List<Film> films = findMany(GET_SORTED_FILMS_BY_LIKES, id);
+        films.forEach(this::setFilmMpaAndGenres);
+        return films;
     }
 
     // заполняет коллекции жанров в фильме по данным из БД
