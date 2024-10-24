@@ -49,6 +49,27 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String FIND_FILMS_BY_USER_LIKES_QUERY = "SELECT fl.film_id FROM film_likes AS fl " +
             "JOIN (SELECT film_id, COUNT(user_id) AS cou FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
             "WHERE fl.user_id = ? ORDER BY gro.cou DESC";
+    private static final String FIND_TOP_RATED_QUERY_BY_GENRE_AND_YEAR = "SELECT  " + fields + ", COUNT(fl.user_id) AS countUsers " +
+            "FROM films AS f " +
+            "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
+            "WHERE f.id IN (SELECT fg.film_id FROM film_genres AS fg WHERE fg.genre_id = ?) AND EXTRACT(YEAR FROM f.release_date) = ? " +
+            "GROUP BY " + fields +
+            " ORDER BY countUsers DESC " +
+            "LIMIT ?";
+    private static final String FIND_TOP_RATED_QUERY_BY_GENRE = "SELECT " + fields + ", COUNT(fl.user_id) AS countUsers " +
+            "FROM films AS f " +
+            "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
+            "WHERE f.id IN (SELECT fg.film_id FROM film_genres AS fg WHERE fg.genre_id = ?) " +
+            "GROUP BY " + fields +
+            " ORDER BY countUsers DESC " +
+            "LIMIT ?";
+    private static final String FIND_TOP_RATED_QUERY_BY_YEAR = "SELECT " + fields + ", COUNT(fl.user_id) AS countUsers " +
+            "FROM films AS f " +
+            "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
+            "WHERE EXTRACT(YEAR FROM f.release_date) = ? " +
+            "GROUP BY " + fields +
+            " ORDER BY countUsers DESC " +
+            "LIMIT ?";
 
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
@@ -180,4 +201,18 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         return filmsIds.stream().map(this::getElement).toList();
     }
 
+    @Override
+    public List<Film> getPopularFilmsByGenreAndYear(Integer genreId, Integer year, Integer count) {
+        return findMany(FIND_TOP_RATED_QUERY_BY_GENRE_AND_YEAR, genreId, year, count);
+    }
+
+    @Override
+    public List<Film> getPopularFilmsByGenre(Integer genreId, Integer count) {
+        return findMany(FIND_TOP_RATED_QUERY_BY_GENRE, genreId, count);
+    }
+
+    @Override
+    public List<Film> getPopularFilmsByYear(Integer year, Integer count) {
+        return findMany(FIND_TOP_RATED_QUERY_BY_YEAR, year, count);
+    }
 }
