@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.review;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Repository
 @Qualifier("ReviewDbStorage")
+@Slf4j
 public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStorage {
     private static final String tableName = "reviews";
     private static final String fields = "id, content, is_positive, user_id, film_id, useful";
@@ -46,6 +48,7 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
 
     @Override
     public Review addElement(Review review) {
+        log.info("Preparing query and getting new id");
         Integer id = insert(INSERT_QUERY,
                 review.getContent(),
                 review.isPositive(),
@@ -54,7 +57,10 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
                 review.getUseful()
         );
 
+        log.info("Setting new id = {} to review", id);
         review.setId(id);
+
+        log.info("Added review {}", review);
         return review;
     }
 
@@ -70,15 +76,17 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
 
     @Override
     public Review updateElement(Review newReview) {
+        log.info("Making update query");
         update(UPDATE_QUERY,
-                newReview.getId(),
                 newReview.getContent(),
                 newReview.isPositive(),
                 newReview.getUserId(),
                 newReview.getFilmId(),
-                newReview.getUseful()
+                newReview.getUseful(),
+                newReview.getId()
         );
 
+        log.info("Returning review {}", newReview);
         return newReview;
     }
 

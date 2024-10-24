@@ -2,16 +2,15 @@ package ru.yandex.practicum.filmorate.model;
 
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import ru.yandex.practicum.filmorate.annotation.Update;
 
-@Getter
-@Setter
-@EqualsAndHashCode
+@Data
+@EqualsAndHashCode(of = "id")
 @ToString
-@NoArgsConstructor
 public class Review {
     @NotNull(groups = {Update.class})
     private Integer id;
@@ -23,7 +22,10 @@ public class Review {
     @NotNull
     private boolean isPositive;
 
+    @NotNull
     private Integer userId;
+    @NotNull
     private Integer filmId;
+
     private Integer useful;
 }
