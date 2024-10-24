@@ -49,6 +49,10 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String FIND_FILMS_BY_USER_LIKES_QUERY = "SELECT fl.film_id FROM film_likes AS fl " +
             "JOIN (SELECT film_id, COUNT(user_id) AS cou FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
             "WHERE fl.user_id = ? ORDER BY gro.cou DESC";
+    private static final String FIND_ALL_TOP_RATED_QUERY = "SELECT " + fields + ", COUNT(fl.user_id) AS count " +
+            "FROM films " +
+            "LEFT JOIN film_likes fl ON (id = fl.film_id) " +
+            "GROUP BY " + fields + " ORDER BY count DESC";
 
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
@@ -180,4 +184,10 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         return filmsIds.stream().map(this::getElement).toList();
     }
 
+    @Override
+    public List<Film> getAllTopRatedFilms() {
+        List<Film> baseList = findMany(FIND_ALL_TOP_RATED_QUERY);
+        baseList.forEach(this::setFilmMpaAndGenres);
+        return baseList;
+    }
 }

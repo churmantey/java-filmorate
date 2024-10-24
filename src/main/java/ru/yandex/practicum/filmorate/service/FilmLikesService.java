@@ -12,4 +12,6 @@ public interface FilmLikesService {
 
     List<FilmDto> getPopular(int count);
 
+    List<FilmDto> getPopularFilmsByYearAndGenre(Integer count,Integer genreId, Integer year);
+
 }

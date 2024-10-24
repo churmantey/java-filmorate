@@ -16,13 +16,6 @@ public class FilmLikesController {
 
     private final FilmLikesService filmLikesService;
 
-    //GET /films/popular?count={count}
-    @GetMapping("/popular")
-    public List<FilmDto> getPopular(@RequestParam(defaultValue = "10") int count) {
-        log.info("GET popular {}", count);
-        return filmLikesService.getPopular(count);
-    }
-
     //PUT /films/{id}/like/{userId}
     @PutMapping("/{id}/like/{userId}")
     public FilmDto addLike(@PathVariable Integer id,
@@ -39,4 +32,12 @@ public class FilmLikesController {
         return filmLikesService.removeLike(id, userId);
     }
 
+    //GET /films/popular?count={limit}&genreId={genreId}&year={year}
+    @GetMapping("/popular")
+    public List<FilmDto> getPopularByYearAndGenre(@RequestParam(defaultValue = "10") int count,
+                                                  @RequestParam(required = false) Integer genreId,
+                                                  @RequestParam(required = false) Integer year) {
+        log.info("GET first {} popular films by genre {} and year {}", count, genreId, year);
+        return filmLikesService.getPopularFilmsByYearAndGenre(count, genreId, year);
+    }
 }
