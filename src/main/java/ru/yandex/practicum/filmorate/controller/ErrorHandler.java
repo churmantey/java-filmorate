@@ -18,7 +18,8 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage(), "Not found");
     }
 
-    @ExceptionHandler({NullObjectException.class, ValidationException.class, ConstraintViolationException.class})
+    @ExceptionHandler({NullObjectException.class, ValidationException.class, IllegalArgumentException.class,
+                       ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNullObjectException(final RuntimeException e) {
         return new ErrorResponse(e.getMessage(), "Bad request");
@@ -29,4 +30,5 @@ public class ErrorHandler {
     public ErrorResponse handleOtherException(final RuntimeException e) {
         return new ErrorResponse(e.getMessage(), "Internal server error");
     }
+
 }

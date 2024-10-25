@@ -24,4 +24,10 @@ public interface FilmStorage extends BaseStorage<Film> {
 
     List<Film> getByContext(SearchParams searchParams);
 
+    List<Film> getPopularFilmsByGenreAndYear(Integer genreId, Integer year, Integer count);
+
+    List<Film> getPopularFilmsByGenre(Integer genreId, Integer count);
+
+    List<Film> getPopularFilmsByYear(Integer year, Integer count);
+
 }
