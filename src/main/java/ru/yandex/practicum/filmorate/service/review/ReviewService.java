@@ -10,9 +10,9 @@ public interface ReviewService {
 
     List<ReviewDto> getByFilmId(Integer filmId, Integer count);
 
-    Review create(Review review);
+    ReviewDto create(Review review);
 
-    Review update(Review review);
+    ReviewDto update(Review review);
 
     boolean delete(Integer id);
 }

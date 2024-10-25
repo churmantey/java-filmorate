@@ -50,20 +50,23 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Review create(Review review) {
+    public ReviewDto create(Review review) {
+        log.info("Making checks");
         userAndFilmCheck(review);
 
+        log.info("Setting up 'useful' field");
         if (review.getUseful() == null) {
             review.setUseful(0);
         }
 
-        return storage.addElement(review);
+        log.info("Calling storage method");
+        return ReviewMapper.mapToReviewDto(storage.addElement(review));
     }
 
     @Override
-    public Review update(Review review) {
+    public ReviewDto update(Review review) {
         log.info("Update review: {}", review);
-        return storage.updateElement(review);
+        return ReviewMapper.mapToReviewDto(storage.updateElement(review));
     }
 
     @Override
@@ -89,8 +92,8 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException("Film not found");
         }
 
-        if (review.getUseful() == null) {
-            throw new IllegalArgumentException("Useful is null");
-        }
+//        if (review.isPositive() == null) {
+//            throw new IllegalArgumentException("Review is null");
+//        }
     }
 }

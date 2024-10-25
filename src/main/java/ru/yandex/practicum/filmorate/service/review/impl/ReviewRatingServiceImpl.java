@@ -3,12 +3,12 @@ package ru.yandex.practicum.filmorate.service.review.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.dto.ReviewDto;
+import ru.yandex.practicum.filmorate.dto.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.review.ReviewRatingService;
 import ru.yandex.practicum.filmorate.storage.review.ReviewRatingStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 @Service
 @Slf4j
@@ -16,63 +16,87 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 public class ReviewRatingServiceImpl implements ReviewRatingService {
     private final ReviewStorage storage;
     private final ReviewRatingStorage ratingStorage;
-    private final UserStorage userStorage;
+
+    private static final String RATING_TYPE_LIKE = "LIKE";
+    private static final String RATING_TYPE_DISLIKE = "DISLIKE";
 
     @Override
-    public Review addLike(Integer id, Integer userId) {
-        Review review = getReviewAndCheck(id, userId);
-
-        review.setUseful(review.getUseful() + 1);
-        storage.updateElement(review);
-        ratingStorage.addRating(id, userId);
-
-        return review;
-    }
-
-    @Override
-    public Review addDislike(Integer id, Integer userId) {
-        Review review = getReviewAndCheck(id, userId);
-
-        review.setUseful(review.getUseful() - 1);
-        storage.updateElement(review);
-        ratingStorage.addRating(id, userId);
-
-        return review;
-    }
-
-    @Override
-    public Review deleteLike(Integer id, Integer userId) {
-        Review review = storage.getElement(id);
-        ratingStorage.deleteRating(review.getId(), userId);
-
-        review.setUseful(review.getUseful() - 1);
-        storage.updateElement(review);
-        ratingStorage.deleteRating(id, userId);
-
-        return review;
-    }
-
-    @Override
-    public Review deleteDislike(Integer id, Integer userId) {
-        Review review = storage.getElement(id);
-        ratingStorage.deleteRating(review.getId(), userId);
-
-        review.setUseful(review.getUseful() + 1);
-        storage.updateElement(review);
-        ratingStorage.deleteRating(id, userId);
-
-        return review;
-    }
-
-    private Review getReviewAndCheck(Integer id, Integer userId) {
-        if (userStorage.getElement(userId) == null) {
-            throw new NotFoundException("User not found");
-        }
-
-        if (ratingStorage.isUserExist(userId)) {
+    public ReviewDto addLike(Integer id, Integer userId) {
+        log.info("Checking if user already liked review with id = {}", id);
+        if (ratingStorage.isUserLiked(id, userId)) {
             throw new IllegalArgumentException("User already rated");
         }
 
-        return storage.getElement(id);
+        Review review = storage.getElement(id);
+        log.info("Gained review = {}", review);
+
+        log.info("Checking if user already disliked review");
+        if (ratingStorage.isUserDisliked(id, userId)) {
+            log.info("Removing previous dislike and updating useful rating for review");
+            review.setUseful(review.getUseful() + 1);
+            ratingStorage.deleteRating(id, userId);
+        }
+
+        log.info("Updating useful rating for review");
+        review.setUseful(review.getUseful() + 1);
+        ratingStorage.addRating(id, userId, RATING_TYPE_LIKE);
+        storage.updateElement(review);
+
+        log.info("Returning updated review = {}", review);
+        return ReviewMapper.mapToReviewDto(review);
+    }
+
+    @Override
+    public ReviewDto addDislike(Integer id, Integer userId) {
+        log.info("Checking if user already disliked review with id = {}", id);
+        if (ratingStorage.isUserDisliked(id, userId)) {
+            throw new IllegalArgumentException("User already rated");
+        }
+
+        Review review = storage.getElement(id);
+        log.info("Gained review = {}", review);
+
+        log.info("Checking if user already liked review");
+        if (ratingStorage.isUserLiked(id, userId)) { // id = 15, userId = 6
+            log.info("Removing previous like and updating useful rating for review");
+            review.setUseful(review.getUseful() - 1);
+            ratingStorage.deleteRating(id, userId);
+        }
+
+        log.info("Updating useful rating for review");
+        review.setUseful(review.getUseful() - 1);
+        ratingStorage.addRating(id, userId, RATING_TYPE_DISLIKE);
+        storage.updateElement(review);
+
+        log.info("Returning updated review = {}", review);
+        return ReviewMapper.mapToReviewDto(review);
+    }
+
+    @Override
+    public ReviewDto deleteLike(Integer id, Integer userId) {
+        Review review = storage.getElement(id);
+        log.info("Gained review = {}", review);
+
+        log.info("Updating useful rating for review and deleting rate");
+        review.setUseful(review.getUseful() - 1);
+        ratingStorage.deleteRating(id, userId);
+        storage.updateElement(review);
+
+        log.info("Returning updated review = {}", review);
+        return ReviewMapper.mapToReviewDto(review);
+    }
+
+    @Override
+    public ReviewDto deleteDislike(Integer id, Integer userId) {
+        Review review = storage.getElement(id);
+        log.info("Gained review = {}", review);
+
+        log.info("Updating useful rating for review and deleting rate");
+        review.setUseful(review.getUseful() + 1);
+        ratingStorage.deleteRating(id, userId);
+        storage.updateElement(review);
+
+        log.info("Returning updated review = {}", review);
+        return ReviewMapper.mapToReviewDto(review);
     }
 }
