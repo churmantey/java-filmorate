@@ -109,9 +109,6 @@ public class FilmServiceImpl implements FilmService {
 
         System.out.println(films);
         return films.stream()
-                .peek(film -> film.getDirectors()
-                        .addAll(new LinkedHashSet<>(directorService.getAllDirectorForOneFilm(film.getId())))
-                )
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
@@ -159,7 +156,6 @@ public class FilmServiceImpl implements FilmService {
         SearchParams searchParams = new SearchParams(query, criterion);
         return filmStorage.getByContext(searchParams).stream()
                 .map(FilmMapper::mapToFilmDto)
-                .sorted(Comparator.comparing(FilmDto::getName))
                 .toList();
     }
 

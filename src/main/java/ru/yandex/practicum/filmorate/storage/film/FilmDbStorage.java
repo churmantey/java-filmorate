@@ -42,24 +42,34 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String GET_SORTED_FILMS_BY_YEAR = "SELECT * FROM FILMS f " +
             "WHERE id IN (SELECT film_id FROM FILMS_DIRECTORS fd WHERE director_id = ?) " +
             "ORDER BY EXTRACT (YEAR FROM release_date);";
-    private static final String GET_SORTED_FILMS_BY_LIKES = "SELECT * FROM FILMS f WHERE id IN " +
-            "( SELECT fd.film_id " +
-            "FROM films_directors fd " +
-            "LEFT JOIN film_likes fl ON fd.film_id = fl.film_id " +
-            "WHERE fd.director_id = ? " +
-            "GROUP BY fd.film_id " +
-            "ORDER BY COUNT(fl.user_id) DESC)";
+    //Переписал запрос Владимира
+    private static final String GET_SORTED_FILMS_BY_LIKES = "SELECT f.*, COUNT(fl.film_id) AS likes_count " +
+            "FROM films f " +
+            "JOIN FILMS_DIRECTORS fd ON f.id=fd.film_id " +
+            "LEFT JOIN film_likes fl ON f.id=fl.film_id " +
+            "WHERE fd.director_id=? " +
+            "GROUP BY f.id " +
+            "ORDER BY likes_count DESC";
 
     private static final String FIND_FILMS_BY_USER_LIKES_QUERY = "SELECT fl.film_id FROM film_likes AS fl " +
             "JOIN (SELECT film_id, COUNT(user_id) AS cou FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
             "WHERE fl.user_id = ? ORDER BY gro.cou DESC";
 
-    private static final String FIND_ALL_BY_NAME_CONTEXT = "SELECT id FROM " + tableName +
-            " WHERE LOCATE(?, title) > 0 ";
-    private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT id FROM " + tableName +
-            " WHERE films.id IN " + "(SELECT fd.film_id FROM films_directors AS fd WHERE fd.director_id IN " +
-            "(SELECT d.id FROM directors AS d WHERE LOCATE(?, d.name) > 0)) ";
-
+    private static final String FIND_ALL_BY_TITLE_CONTEXT = "SELECT * FROM " + tableName +
+            " WHERE LOCATE(?, title) > 0 ORDER BY title";
+    private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT * FROM films AS f" +
+            " WHERE f.id IN " +
+            "(SELECT fd.film_id FROM films_directors AS fd WHERE fd.director_id IN " +
+            "(SELECT d.id FROM directors AS d WHERE LOCATE(?, d.name) > 0)) " +
+            "ORDER BY f.title";
+    private static final String FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT = "SELECT DISTINCT * FROM " +
+            "(SELECT f1.* FROM films f1 WHERE LOCATE(?, f1.title) > 0 " +
+            "UNION " +
+            "SELECT f2.* FROM films f2 " +
+            "WHERE f2.id IN " +
+            "(SELECT fd.film_id FROM films_directors AS fd " +
+            "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOCATE(?, d.name) > 0))) AS f " +
+            "ORDER BY f.title";
 
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
@@ -196,17 +206,18 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     public List<Film> getByContext(SearchParams searchParams) {
-        Set<Integer> filmIds = new LinkedHashSet<>();
+        List<Film> baseList = new ArrayList<>();
         log.info("SearchParams {}", searchParams);
-        if (searchParams.isNeedTitle()) {
-            filmIds.addAll(retrieveIdList(FIND_ALL_BY_NAME_CONTEXT, searchParams.getQuery()));
+        if (searchParams.isNeedTitle() && !searchParams.isNeedDirector()) {
+            baseList = findMany(FIND_ALL_BY_TITLE_CONTEXT, searchParams.getQuery());
         }
-        if (searchParams.isNeedDirector()) {
-            filmIds.addAll(retrieveIdList(FIND_ALL_BY_DIRECTOR_CONTEXT, searchParams.getQuery()));
+        if (searchParams.isNeedDirector() && !searchParams.isNeedTitle()) {
+            baseList = findMany(FIND_ALL_BY_DIRECTOR_CONTEXT, searchParams.getQuery());
         }
-        List<Film> baseList = filmIds.stream()
-                .map(this::getElement)
-                .toList();
+        if (searchParams.isNeedDirector() && searchParams.isNeedTitle()) {
+            baseList = findMany(FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT,
+                    searchParams.getQuery(), searchParams.getQuery());
+        }
         baseList.forEach(this::setFilmMpaAndGenresAndDirectors);
         return baseList;
     }
