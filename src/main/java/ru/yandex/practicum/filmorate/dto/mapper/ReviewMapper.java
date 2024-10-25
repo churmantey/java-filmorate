@@ -12,7 +12,7 @@ public final class ReviewMapper {
 
         dto.setReviewId(review.getId());
         dto.setContent(review.getContent());
-        dto.setIsPositive(review.isPositive());
+        dto.setIsPositive(review.getIsPositive());
         dto.setUserId(review.getUserId());
         dto.setFilmId(review.getFilmId());
         dto.setUseful(review.getUseful());

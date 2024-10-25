@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.annotation.Update;
 @EqualsAndHashCode(of = "id")
 @ToString
 public class Review {
-    @NotNull(groups = {Update.class})
     private Integer id;
 
     @NotBlank
@@ -20,7 +19,7 @@ public class Review {
     private String content;
 
     @NotNull
-    private boolean isPositive;
+    private Boolean isPositive;
 
     @NotNull
     private Integer userId;

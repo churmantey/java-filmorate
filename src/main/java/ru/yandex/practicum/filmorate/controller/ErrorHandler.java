@@ -17,7 +17,7 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler({NullObjectException.class, ValidationException.class})
+    @ExceptionHandler({NullObjectException.class, ValidationException.class, IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNullObjectException(final RuntimeException e) {
         return new ErrorResponse(e.getMessage());
@@ -28,5 +28,6 @@ public class ErrorHandler {
     public ErrorResponse handleOtherException(final RuntimeException e) {
         return new ErrorResponse(e.getMessage());
     }
+
 
 }
