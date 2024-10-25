@@ -22,7 +22,17 @@ public class UserController {
     @GetMapping
     public List<UserDto> getAllUsers() {
         log.info("GET users");
-        return userService.getAllUsers();
+        List<UserDto> userList = userService.getAllUsers();
+        log.info("GET users RESPONSE {}", userList);
+        return userList;
+    }
+
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable Integer userId) {
+        log.info("GET user {}", userId);
+        UserDto user = userService.getUserById(userId);
+        log.info("GET user RESPONSE {}", user);
+        return user;
     }
 
     @PostMapping
@@ -37,4 +47,10 @@ public class UserController {
         return userService.updateUser(updateUserRequest);
     }
 
+    @DeleteMapping("/{userId}")
+    public boolean delete(@PathVariable Integer userId) {
+        log.info("DELETE user {}", userId);
+        UserDto user = userService.getUserById(userId);
+        return userService.deleteUserById(user.getId());
+    }
 }

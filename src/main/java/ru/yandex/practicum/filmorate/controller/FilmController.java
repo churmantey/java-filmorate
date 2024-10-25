@@ -22,15 +22,27 @@ public class FilmController {
     @GetMapping
     public List<FilmDto> getAllFilms() {
         log.info("GET films");
-        return filmService.getAllFilms();
+        List<FilmDto> filmList = filmService.getAllFilms();
+        log.info("GET films RESPONSE {}", filmList);
+        return filmList;
     }
 
     @GetMapping("/{filmId}")
     public FilmDto getFilm(@PathVariable Integer filmId) {
         log.info("GET film {}", filmId);
-        return filmService.getFilmById(filmId);
+        FilmDto filmDto = filmService.getFilmById(filmId);
+        log.info("GET film RESPONSE {}", filmDto);
+        return  filmDto;
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<FilmDto> getFilmsByDirectorSorted(@PathVariable Integer directorId,
+                                                  @RequestParam(name = "sortBy") String sort) {
+        log.info("Пришел GET запрос /films/director/{} с сортировкой по {}", directorId, sort);
+        List<FilmDto> films = filmService.getSortedFilms(directorId, sort);
+        log.info("Отправлен GET ответ с телом {}", films);
+        return films;
+    }
 
     @PostMapping
     public FilmDto create(@Valid @RequestBody NewFilmRequest newFilmRequest) {
@@ -44,4 +56,18 @@ public class FilmController {
         return filmService.updateFilm(updateFilmRequest);
     }
 
+    @DeleteMapping("/{filmId}")
+    public boolean delete(@PathVariable Integer filmId) {
+        log.info("DELETE film {}", filmId);
+        FilmDto film = filmService.getFilmById(filmId);
+        return filmService.deleteFilmById(film.getId());
+    }
+
+    @GetMapping("/common")
+    public List<FilmDto> getCommonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) {
+        log.info("GET commonFilms from userId {}, friendId {}", userId, friendId);
+        List<FilmDto> commonFilms = filmService.getCommonFilmsLikesByUsers(userId, friendId);
+        log.info("GET commonFilms films {}", commonFilms);
+        return commonFilms;
+    }
 }

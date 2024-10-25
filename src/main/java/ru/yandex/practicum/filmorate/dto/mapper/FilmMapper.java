@@ -21,6 +21,11 @@ public final class FilmMapper {
         if (request.getGenres() != null) {
             film.getGenres().addAll(request.getGenres());
         }
+
+        if (request.getDirectors() != null) {
+            film.getDirectors().addAll(request.getDirectors());
+        }
+
         return film;
     }
 
@@ -52,6 +57,10 @@ public final class FilmMapper {
                     film.getGenres().stream()
                             .map(genre -> new IdEntity(genre.getId(), genre.getName()))
                             .toList());
+        }
+
+        if (film.getDirectors() != null) {
+            filmDto.getDirectors().addAll(film.getDirectors());
         }
         return filmDto;
     }

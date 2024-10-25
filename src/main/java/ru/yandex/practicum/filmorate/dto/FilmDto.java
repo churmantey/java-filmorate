@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.dto;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import ru.yandex.practicum.filmorate.model.Director;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -19,10 +20,12 @@ public class FilmDto {
     private IdEntity mpa;
     private final Set<IdEntity> likes;
     private final Set<IdEntity> genres;
+    private final Set<Director> directors;
 
     public FilmDto() {
         this.likes = new LinkedHashSet<>();
         this.genres = new LinkedHashSet<>();
+        this.directors = new LinkedHashSet<>();
     }
 
 }
