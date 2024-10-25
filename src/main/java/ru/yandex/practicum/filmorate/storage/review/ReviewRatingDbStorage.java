@@ -40,10 +40,8 @@ public class ReviewRatingDbStorage implements ReviewRatingStorage {
     public boolean isUserLiked(Integer id, Integer userId) {
         String sql = "SELECT COUNT(*) FROM REVIEWS_RATINGS WHERE REVIEW_ID = :id AND " +
                 "USER_ID = :userId AND RATING_TYPE LIKE 'LIKE';";
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("id", id);
-        params.addValue("userId", userId);
-        Integer rows = jdbc.queryForObject(sql, params, Integer.class);
+
+        int rows = makeQuery(sql, id, userId);
 
         return rows > 0;
     }
@@ -52,11 +50,23 @@ public class ReviewRatingDbStorage implements ReviewRatingStorage {
     public boolean isUserDisliked(Integer id, Integer userId) {
         String sql = "SELECT COUNT(*) FROM REVIEWS_RATINGS WHERE REVIEW_ID = :id " +
                 "AND USER_ID = :userId AND RATING_TYPE LIKE 'DISLIKE';";
+
+        int rows = makeQuery(sql, id, userId);
+
+        return rows > 0;
+    }
+
+    private int makeQuery(String sql, Integer id, Integer userId) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
         params.addValue("userId", userId);
         Integer rows = jdbc.queryForObject(sql, params, Integer.class);
-        return rows > 0;
+
+        if (rows != null) {
+            return rows;
+        }
+
+        return 0;
     }
 
 }
