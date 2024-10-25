@@ -1,35 +1,82 @@
 package ru.yandex.practicum.filmorate.storage.review;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.ReviewRating;
-import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
+
 
 @Repository
-public class ReviewRatingDbStorage extends BaseDbStorage<ReviewRating> implements ReviewRatingStorage {
-    private static final String DELETE_RATING_QUERY = "DELETE FROM reviews_ratings WHERE review_id = ? AND user_id = ?";
-    private static final String INSERT_RATING_QUERY = "INSERT INTO reviews_ratings" +
-            " (review_id, user_id) " +
-            " VALUES (?, ?)";
-    private static final String FIND_USER_IN_RATINGS_QUERY = "SELECT review_id, user_id " +
-            "FROM reviews_ratings WHERE user_id = ?";
+@Slf4j
+@RequiredArgsConstructor
+public class ReviewRatingDbStorage implements ReviewRatingStorage {
+    private final NamedParameterJdbcTemplate jdbc;
 
-    public ReviewRatingDbStorage(JdbcTemplate jdbc, RowMapper<ReviewRating> mapper) {
-        super(jdbc, mapper);
+    @Override
+    public void addRating(Integer id, Integer userId, String type) {
+
+        String sql = """
+        INSERT INTO reviews_ratings(review_id, user_id, rating_type)
+        VALUES (:reviewId, :userId, :ratingType);
+""";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("reviewId", id);
+        params.addValue("userId", userId);
+        params.addValue("ratingType", type);
+        jdbc.update(sql, params);
     }
 
-    public boolean addRating(Integer id, Integer userId) {
-        Integer rows = insert(INSERT_RATING_QUERY, id, userId);
+    @Override
+    public void updateRating(Integer id, Integer userId, String type) {
+        String sql = "UPDATE REVIEWS_RATINGS SET RATING_TYPE = :type " +
+                "WHERE review_id = :reviewId AND user_id = :userId;";
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("type", type);
+        params.addValue("reviewId", id);
+        params.addValue("userId", userId);
+        jdbc.update(sql, params);
+    }
+
+    @Override
+    public void deleteRating(Integer id, Integer userId) {
+        String sql = "DELETE FROM reviews_ratings WHERE REVIEW_ID = :reviewId AND USER_ID = :userId;";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("reviewId", id);
+        params.addValue("userId", userId);
+        jdbc.update(sql, params);
+    }
+
+    @Override
+    public boolean isUserRated(Integer id, Integer userId) {
+        String sql = "SELECT COUNT(*) FROM REVIEWS_RATINGS WHERE REVIEW_ID = :reviewId AND USER_ID = :userId;";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("reviewId", id);
+        params.addValue("userId", userId);
+        Integer rows = jdbc.queryForObject(sql, params, Integer.class);
+        return rows == null;
+    }
+
+    public boolean isUserLiked(Integer id, Integer userId) {
+        String sql = "SELECT COUNT(*) FROM REVIEWS_RATINGS WHERE REVIEW_ID = :id AND " +
+                "USER_ID = :userId AND RATING_TYPE LIKE 'LIKE';";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", id);
+        params.addValue("userId", userId);
+        Integer rows = jdbc.queryForObject(sql, params, Integer.class);
 
         return rows > 0;
     }
 
-    public boolean deleteRating(Integer id, Integer userId) {
-        return delete(DELETE_RATING_QUERY, id, userId);
+    public boolean isUserDisliked(Integer id, Integer userId) {
+        String sql = "SELECT COUNT(*) FROM REVIEWS_RATINGS WHERE REVIEW_ID = :id " +
+                "AND USER_ID = :userId AND RATING_TYPE LIKE 'DISLIKE';";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", id);
+        params.addValue("userId", userId);
+        Integer rows = jdbc.queryForObject(sql, params, Integer.class);
+        return rows > 0;
     }
 
-    public boolean isUserExist(Integer id) {
-        return !findMany(FIND_USER_IN_RATINGS_QUERY, id).isEmpty();
-    }
 }

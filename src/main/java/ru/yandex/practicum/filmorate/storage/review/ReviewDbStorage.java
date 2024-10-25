@@ -48,19 +48,16 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
 
     @Override
     public Review addElement(Review review) {
-        log.info("Preparing query and getting new id");
         Integer id = insert(INSERT_QUERY,
                 review.getContent(),
-                review.isPositive(),
+                review.getIsPositive(),
                 review.getUserId(),
                 review.getFilmId(),
                 review.getUseful()
         );
 
-        log.info("Setting new id = {} to review", id);
         review.setId(id);
 
-        log.info("Added review {}", review);
         return review;
     }
 
@@ -76,17 +73,15 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
 
     @Override
     public Review updateElement(Review newReview) {
-        log.info("Making update query");
         update(UPDATE_QUERY,
                 newReview.getContent(),
-                newReview.isPositive(),
+                newReview.getIsPositive(),
                 newReview.getUserId(),
                 newReview.getFilmId(),
                 newReview.getUseful(),
                 newReview.getId()
         );
 
-        log.info("Returning review {}", newReview);
         return newReview;
     }
 
@@ -94,4 +89,5 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
     public boolean deleteElementById(Integer id) {
         return delete(DELETE_QUERY, id);
     }
+
 }

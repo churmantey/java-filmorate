@@ -32,13 +32,13 @@ public class ReviewController {
     }
 
     @PostMapping
-    public Review create(@Valid @RequestBody Review review) {
-        log.info("Create review: {}", review);
+    public ReviewDto create(@Valid @RequestBody Review review) {
+        log.info("POST create with body :{}", review);
         return reviewService.create(review);
     }
 
-    @PutMapping("/{id}")
-    public Review update(@Validated(Update.class) @RequestBody Review review) {
+    @PutMapping
+    public ReviewDto update(@Valid @RequestBody Review review) {
         log.info("Update review: {}", review);
         return reviewService.update(review);
     }

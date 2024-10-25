@@ -1,9 +1,17 @@
 package ru.yandex.practicum.filmorate.storage.review;
 
+
 public interface ReviewRatingStorage {
-    boolean addRating(Integer id, Integer userId);
 
-    boolean deleteRating(Integer id, Integer userId);
+    boolean isUserRated(Integer id, Integer userId);
 
-    boolean isUserExist(Integer id);
+    void addRating(Integer id, Integer userId, String type);
+
+    void updateRating(Integer id, Integer userId, String type);
+
+    void deleteRating(Integer id, Integer userId);
+
+    boolean isUserLiked(Integer id, Integer userId);
+
+    boolean isUserDisliked(Integer id, Integer userId);
 }
