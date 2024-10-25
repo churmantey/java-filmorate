@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service.review.impl;
+package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.dto.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.service.review.ReviewRatingService;
 import ru.yandex.practicum.filmorate.storage.review.ReviewRatingStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 

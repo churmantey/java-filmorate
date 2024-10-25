@@ -28,18 +28,6 @@ public class ReviewRatingDbStorage implements ReviewRatingStorage {
     }
 
     @Override
-    public void updateRating(Integer id, Integer userId, String type) {
-        String sql = "UPDATE REVIEWS_RATINGS SET RATING_TYPE = :type " +
-                "WHERE review_id = :reviewId AND user_id = :userId;";
-
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("type", type);
-        params.addValue("reviewId", id);
-        params.addValue("userId", userId);
-        jdbc.update(sql, params);
-    }
-
-    @Override
     public void deleteRating(Integer id, Integer userId) {
         String sql = "DELETE FROM reviews_ratings WHERE REVIEW_ID = :reviewId AND USER_ID = :userId;";
         MapSqlParameterSource params = new MapSqlParameterSource();
@@ -49,15 +37,6 @@ public class ReviewRatingDbStorage implements ReviewRatingStorage {
     }
 
     @Override
-    public boolean isUserRated(Integer id, Integer userId) {
-        String sql = "SELECT COUNT(*) FROM REVIEWS_RATINGS WHERE REVIEW_ID = :reviewId AND USER_ID = :userId;";
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("reviewId", id);
-        params.addValue("userId", userId);
-        Integer rows = jdbc.queryForObject(sql, params, Integer.class);
-        return rows == null;
-    }
-
     public boolean isUserLiked(Integer id, Integer userId) {
         String sql = "SELECT COUNT(*) FROM REVIEWS_RATINGS WHERE REVIEW_ID = :id AND " +
                 "USER_ID = :userId AND RATING_TYPE LIKE 'LIKE';";
@@ -69,6 +48,7 @@ public class ReviewRatingDbStorage implements ReviewRatingStorage {
         return rows > 0;
     }
 
+    @Override
     public boolean isUserDisliked(Integer id, Integer userId) {
         String sql = "SELECT COUNT(*) FROM REVIEWS_RATINGS WHERE REVIEW_ID = :id " +
                 "AND USER_ID = :userId AND RATING_TYPE LIKE 'DISLIKE';";

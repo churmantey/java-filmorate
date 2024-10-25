@@ -19,7 +19,8 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
     private static final String fields = "id, content, is_positive, user_id, film_id, useful";
     private static final String FIND_ALL_QUERY = "SELECT " + fields + " from " + tableName;
     private static final String FIND_BY_ID_QUERY = FIND_ALL_QUERY + " WHERE id = ?";
-    private static final String FIND_ALL_BY_FILM_ID_QUERY = FIND_ALL_QUERY + " WHERE film_id = ? LIMIT ?";
+    private static final String FIND_ALL_REVIEWS_BY_FILM_ID_QUERY = FIND_ALL_QUERY +
+            " WHERE film_id = ? ORDER BY useful LIMIT ?";
     private static final String INSERT_QUERY = "INSERT INTO " + tableName +
             " (content, is_positive, user_id, film_id, useful) " +
             " VALUES (?, ?, ?, ?, ?)";
@@ -38,11 +39,11 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
     }
 
     public List<Review> getByFilm(int id, int count) {
-        return findMany(FIND_ALL_BY_FILM_ID_QUERY, id, count);
+        return findMany(FIND_ALL_REVIEWS_BY_FILM_ID_QUERY, id, count);
     }
 
     public List<Review> getByFilm(int count) {
-        String sql = FIND_ALL_BY_FILM_ID_QUERY + " LIMIT ?";
+        String sql = FIND_ALL_QUERY + "ORDER BY useful LIMIT ?";
         return findMany(sql, count);
     }
 
@@ -56,7 +57,7 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
                 review.getUseful()
         );
 
-        review.setId(id);
+        review.setReviewId(id);
 
         return review;
     }
@@ -79,7 +80,7 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
                 newReview.getUserId(),
                 newReview.getFilmId(),
                 newReview.getUseful(),
-                newReview.getId()
+                newReview.getReviewId()
         );
 
         return newReview;

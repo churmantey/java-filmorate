@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service.review.impl;
+package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.dto.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.service.review.ReviewService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -24,22 +23,23 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewDto get(Integer id) {
-        log.info("Get review by id: {}", id);
+        log.info("Getting review by id: {}", id);
         return ReviewMapper.mapToReviewDto(storage.getElement(id));
     }
 
     @Override
     public List<ReviewDto> getByFilmId(Integer filmId, Integer count) {
-        log.info("Get reviews by filmId and count: {}, {}", filmId, count);
+        log.info("Getting reviews by filmId and count: {}, {}", filmId, count);
 
         log.info("Checking count: {}", count);
         if (count == null) {
+            log.info("Count is null, setting to default value");
             count = 10;
         }
 
         log.info("Checking filmId: {}", filmId);
         if (filmId == null) {
-            log.info("FilmId is null");
+            log.info("FilmId is null, returning 10 most rated films");
             return storage.getByFilm(count).stream()
                     .map(ReviewMapper::mapToReviewDto).toList();
         }
@@ -51,7 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewDto create(Review review) {
-        log.info("Making checks");
+        log.info("Making checks for user and film");
         userAndFilmCheck(review);
 
         log.info("Setting up 'useful' field");
@@ -59,7 +59,7 @@ public class ReviewServiceImpl implements ReviewService {
             review.setUseful(0);
         }
 
-        log.info("Calling storage method");
+        log.info("Creating new review instance in database");
         return ReviewMapper.mapToReviewDto(storage.addElement(review));
     }
 
@@ -91,9 +91,5 @@ public class ReviewServiceImpl implements ReviewService {
         if (filmStorage.getElement(review.getFilmId()) == null) {
             throw new NotFoundException("Film not found");
         }
-
-//        if (review.isPositive() == null) {
-//            throw new IllegalArgumentException("Review is null");
-//        }
     }
 }

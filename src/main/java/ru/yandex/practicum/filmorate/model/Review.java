@@ -9,10 +9,10 @@ import lombok.*;
 import ru.yandex.practicum.filmorate.annotation.Update;
 
 @Data
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "reviewId")
 @ToString
 public class Review {
-    private Integer id;
+    private Integer reviewId;
 
     @NotBlank
     @Size(min = 1, max = 200)
