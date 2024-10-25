@@ -42,12 +42,10 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String GET_SORTED_FILMS_BY_YEAR = "SELECT * FROM FILMS f " +
             "WHERE id IN (SELECT film_id FROM FILMS_DIRECTORS fd WHERE director_id = ?) " +
             "ORDER BY EXTRACT (YEAR FROM release_date);";
-    //Переписал запрос Владимира
     private static final String GET_SORTED_FILMS_BY_LIKES = "SELECT f.*, COUNT(fl.film_id) AS likes_count " +
             "FROM films f " +
-            "JOIN FILMS_DIRECTORS fd ON f.id=fd.film_id " +
+            "JOIN FILMS_DIRECTORS fd ON f.id=fd.film_id AND fd.DIRECTOR_ID = ? " +
             "LEFT JOIN film_likes fl ON f.id=fl.film_id " +
-            "WHERE fd.director_id=? " +
             "GROUP BY f.id " +
             "ORDER BY likes_count DESC";
 
@@ -62,14 +60,14 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "(SELECT fd.film_id FROM films_directors AS fd WHERE fd.director_id IN " +
             "(SELECT d.id FROM directors AS d WHERE LOCATE(?, d.name) > 0)) " +
             "ORDER BY f.title";
+    //по тесту выяснилось, что сортировать по title здесь фильмы не нужно, в остальных запросах пока оставил
     private static final String FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT = "SELECT DISTINCT * FROM " +
             "(SELECT f1.* FROM films f1 WHERE LOCATE(?, f1.title) > 0 " +
             "UNION " +
             "SELECT f2.* FROM films f2 " +
             "WHERE f2.id IN " +
             "(SELECT fd.film_id FROM films_directors AS fd " +
-            "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOCATE(?, d.name) > 0))) AS f " +
-            "ORDER BY f.title";
+            "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOCATE(?, d.name) > 0))) AS f";
 
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
@@ -207,7 +205,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     public List<Film> getByContext(SearchParams searchParams) {
         List<Film> baseList = new ArrayList<>();
-        log.info("SearchParams {}", searchParams);
         if (searchParams.isNeedTitle() && !searchParams.isNeedDirector()) {
             baseList = findMany(FIND_ALL_BY_TITLE_CONTEXT, searchParams.getQuery());
         }
