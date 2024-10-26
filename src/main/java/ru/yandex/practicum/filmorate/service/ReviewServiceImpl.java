@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.dto.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.EventOperation;
+import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
@@ -20,6 +22,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewStorage storage;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final EventService eventService;
 
     @Override
     public ReviewDto get(Integer id) {
@@ -60,18 +63,23 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         log.info("Creating new review instance in database");
-        return ReviewMapper.mapToReviewDto(storage.addElement(review));
+        ReviewDto reviewDto = ReviewMapper.mapToReviewDto(storage.addElement(review));
+        eventService.createEvent(review.getUserId(), EventType.REVIEW, EventOperation.ADD, review.getReviewId());
+        return reviewDto;
     }
 
     @Override
     public ReviewDto update(Review review) {
         log.info("Update review: {}", review);
+        eventService.createEvent(review.getUserId(), EventType.REVIEW, EventOperation.UPDATE, review.getReviewId());
         return ReviewMapper.mapToReviewDto(storage.updateElement(review));
     }
 
     @Override
     public boolean delete(Integer id) {
         log.info("Delete review by id: {}", id);
+        Review review = storage.getElement(id);
+        eventService.createEvent(review.getUserId(), EventType.REVIEW, EventOperation.REMOVE, id);
         return storage.deleteElementById(id);
     }
 
