@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.event;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.EventOperation;
 import ru.yandex.practicum.filmorate.model.EventType;
-import ru.yandex.practicum.filmorate.storage.BaseStorage;
 
 import java.util.List;
 
