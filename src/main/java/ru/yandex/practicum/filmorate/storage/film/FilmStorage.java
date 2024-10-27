@@ -30,4 +30,6 @@ public interface FilmStorage extends BaseStorage<Film> {
 
     List<Film> getPopularFilmsByYear(Integer year, Integer count);
 
+    List<Film> getRecommendedFilms(Integer userId);
+
 }
