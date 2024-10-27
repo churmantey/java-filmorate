@@ -224,7 +224,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         return filmsIds.stream().map(this::getElement).toList();
     }
 
-    public List<Film> getByContext(SearchParams searchParams) {
+    public List<Film> findFilmsBySearchParameters(SearchParams searchParams) {
         List<Film> baseList = new ArrayList<>();
         if (searchParams.isNeedTitle() && !searchParams.isNeedDirector()) {
             baseList = findMany(FIND_ALL_BY_TITLE_CONTEXT, searchParams.getQuery());

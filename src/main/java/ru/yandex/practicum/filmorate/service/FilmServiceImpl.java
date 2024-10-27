@@ -154,7 +154,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<FilmDto> getFilmsByContext(String query, String criterion) {
         SearchParams searchParams = new SearchParams(query, criterion);
-        return filmStorage.getByContext(searchParams).stream()
+        return filmStorage.findFilmsBySearchParameters(searchParams).stream()
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
