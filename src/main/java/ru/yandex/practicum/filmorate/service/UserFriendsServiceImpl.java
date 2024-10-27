@@ -38,7 +38,6 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     public UserDto addFriend(Integer userId, Integer friendId) {
         User user = userStorage.getElement(userId);
         User friend = userStorage.getElement(friendId);
-
         eventService.createEvent(userId, EventType.FRIEND, EventOperation.ADD, friendId);
         return UserMapper.mapToUserDto(
                 userStorage.addUserFriend(userId, friendId)
@@ -49,8 +48,8 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     public UserDto removeFriend(Integer userId, Integer friendId) {
         User user = userStorage.getElement(userId);
         User friend = userStorage.getElement(friendId);
-        userStorage.removeUserFriend(userId, friendId);
         eventService.createEvent(userId, EventType.FRIEND, EventOperation.REMOVE, friendId);
+        userStorage.removeUserFriend(userId, friendId);
         return UserMapper.mapToUserDto(user);
     }
 

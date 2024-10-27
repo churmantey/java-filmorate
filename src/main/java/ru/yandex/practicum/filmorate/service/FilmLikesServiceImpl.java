@@ -27,8 +27,8 @@ public class FilmLikesServiceImpl implements FilmLikesService {
     public FilmDto addLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getElement(filmId);
         User user = userStorage.getElement(userId);
-        filmStorage.addLike(filmId, userId);
         eventService.createEvent(userId, EventType.LIKE, EventOperation.ADD, filmId);
+        filmStorage.addLike(filmId, userId);
         return FilmMapper.mapToFilmDto(film);
     }
 
@@ -36,8 +36,8 @@ public class FilmLikesServiceImpl implements FilmLikesService {
     public FilmDto removeLike(Integer filmId, Integer userId) {
         Film film = filmStorage.getElement(filmId);
         User user = userStorage.getElement(userId);
-        filmStorage.removeLike(filmId, userId);
         eventService.createEvent(userId, EventType.LIKE, EventOperation.REMOVE, filmId);
+        filmStorage.removeLike(filmId, userId);
         return FilmMapper.mapToFilmDto(
                 filmStorage.getElement(filmId)
         );
