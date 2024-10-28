@@ -75,12 +75,12 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "LIMIT ?";
 
     private static final String FIND_ALL_BY_TITLE_CONTEXT = "SELECT * FROM " + tableName +
-            " WHERE LOWER(films.title) LIKE ? ORDER BY rating_id";
+            " WHERE LOWER(films.title) LIKE ? ORDER BY release_date DESC";
     private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT * FROM films AS f" +
             " WHERE f.id IN " +
             "(SELECT fd.film_id FROM films_directors AS fd WHERE fd.director_id IN " +
             "(SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
-            "ORDER BY f.rating_id";
+            "ORDER BY f.release_date DESC";
     private static final String FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT = "SELECT DISTINCT * FROM " +
             "(SELECT f1.* FROM films f1 WHERE LOWER(f1.title) LIKE ? " +
             "UNION " +
@@ -88,7 +88,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "WHERE f2.id IN " +
             "(SELECT fd.film_id FROM films_directors AS fd " +
             "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?))) AS f " +
-            "ORDER BY f.rating_id";
+            "ORDER BY f.release_date DESC";
 
     private static final String FIND_RECOMMENDED_FOR_USER_QUERY = "SELECT " + fields + " FROM " + tableName + " " +
             """
