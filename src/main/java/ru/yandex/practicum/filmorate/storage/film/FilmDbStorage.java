@@ -87,7 +87,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "SELECT f2.* FROM films f2 " +
             "WHERE f2.id IN " +
             "(SELECT fd.film_id FROM films_directors AS fd " +
-            "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?))) AS f" +
+            "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?))) AS f " +
             "ORDER BY f.rating_id";
 
     private static final String FIND_RECOMMENDED_FOR_USER_QUERY = "SELECT " + fields + " FROM " + tableName + " " +
