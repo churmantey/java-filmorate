@@ -10,7 +10,7 @@ public class SearchParams {
     private final boolean isNeedTitle;
 
     public SearchParams(String query, String inputParam) {
-        this.query = query;
+        this.query = "%" + query.toLowerCase() + "%";
         this.isNeedDirector = inputParam.contains("director");
         this.isNeedTitle = inputParam.contains("title");
     }
