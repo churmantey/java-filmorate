@@ -138,7 +138,7 @@ public class FilmServiceImpl implements FilmService {
                     .map(Director::getId)
                     .collect(Collectors.toSet());
             List<Director> directors = directorService.getDirectorByIds(directorsIds);
-            if (newFilmRequest.getDirectors().size() != directors.size()) {
+            if (directorsIds.size() != directors.size()) {
                 throw new ValidationException("Введен некорректный режиссер");
             }
             newFilmRequest.setDirectors(new LinkedHashSet<>(directors));
