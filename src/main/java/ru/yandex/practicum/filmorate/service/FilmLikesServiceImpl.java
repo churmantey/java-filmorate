@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
@@ -20,7 +19,6 @@ public class FilmLikesServiceImpl implements FilmLikesService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-    private final GenreStorage genreStorage;
     private final EventService eventService;
 
     @Override
@@ -29,7 +27,7 @@ public class FilmLikesServiceImpl implements FilmLikesService {
         User user = userStorage.getElement(userId);
         eventService.createEvent(userId, EventType.LIKE, EventOperation.ADD, filmId);
         filmStorage.addLike(filmId, userId);
-        return FilmMapper.mapToFilmDto(film);
+        return FilmMapper.mapToFilmDto(filmStorage.getElement(filmId));
     }
 
     @Override
@@ -38,9 +36,7 @@ public class FilmLikesServiceImpl implements FilmLikesService {
         User user = userStorage.getElement(userId);
         eventService.createEvent(userId, EventType.LIKE, EventOperation.REMOVE, filmId);
         filmStorage.removeLike(filmId, userId);
-        return FilmMapper.mapToFilmDto(
-                filmStorage.getElement(filmId)
-        );
+        return FilmMapper.mapToFilmDto(filmStorage.getElement(filmId));
     }
 
     @Override
