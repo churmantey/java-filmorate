@@ -169,7 +169,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public List<Film> getTopRatedFilms(int count) {
-        return findMany(FIND_TOP_RATED_QUERY, count);
+        List<Film> films = findMany(FIND_TOP_RATED_QUERY, count);
+        films.forEach(this::setFilmMpaAndGenresAndDirectors);
+        return films;
     }
 
     @Override
@@ -258,17 +260,23 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilmsByGenreAndYear(Integer genreId, Integer year, Integer count) {
-        return findMany(FIND_TOP_RATED_QUERY_BY_GENRE_AND_YEAR, genreId, year, count);
+        List<Film> films = findMany(FIND_TOP_RATED_QUERY_BY_GENRE_AND_YEAR, genreId, year, count);
+        films.forEach(this::setFilmMpaAndGenresAndDirectors);
+        return films;
     }
 
     @Override
     public List<Film> getPopularFilmsByGenre(Integer genreId, Integer count) {
-        return findMany(FIND_TOP_RATED_QUERY_BY_GENRE, genreId, count);
+        List<Film> films = findMany(FIND_TOP_RATED_QUERY_BY_GENRE, genreId, count);
+        films.forEach(this::setFilmMpaAndGenresAndDirectors);
+        return films;
     }
 
     @Override
     public List<Film> getPopularFilmsByYear(Integer year, Integer count) {
-        return findMany(FIND_TOP_RATED_QUERY_BY_YEAR, year, count);
+        List<Film> films = findMany(FIND_TOP_RATED_QUERY_BY_YEAR, year, count);
+        films.forEach(this::setFilmMpaAndGenresAndDirectors);
+        return films;
     }
 
     @Override
