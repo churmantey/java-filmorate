@@ -82,7 +82,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "(SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
             "ORDER BY f.release_date DESC";
     private static final String FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT = "SELECT DISTINCT f.* FROM FILMS f " +
-            "LEFT JOIN FILMS_DIRECTORS fd ON f.ID = fd.FILM_ID " +  
+            "LEFT JOIN FILMS_DIRECTORS fd ON f.ID = fd.FILM_ID " +
             "LEFT JOIN DIRECTORS d ON fd.DIRECTOR_ID = d.ID " +
             "WHERE f.TITLE LIKE ? OR d.NAME LIKE ?";
 
