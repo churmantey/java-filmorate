@@ -20,7 +20,7 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
     private static final String FIND_ALL_QUERY = "SELECT " + fields + " from " + tableName;
     private static final String FIND_BY_ID_QUERY = FIND_ALL_QUERY + " WHERE id = ?";
     private static final String FIND_ALL_REVIEWS_BY_FILM_ID_QUERY = FIND_ALL_QUERY +
-            " WHERE film_id = ? ORDER BY useful LIMIT ?";
+            " WHERE film_id = ? ORDER BY useful DESC LIMIT ?";
     private static final String INSERT_QUERY = "INSERT INTO " + tableName +
             " (content, is_positive, user_id, film_id, useful) " +
             " VALUES (?, ?, ?, ?, ?)";
@@ -43,7 +43,7 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
     }
 
     public List<Review> getByFilm(int count) {
-        String sql = FIND_ALL_QUERY + "ORDER BY useful LIMIT ?";
+        String sql = FIND_ALL_QUERY + " ORDER BY useful DESC LIMIT ?";
         return findMany(sql, count);
     }
 
@@ -74,7 +74,7 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
 
     @Override
     public Review updateElement(Review newReview) {
-        update(UPDATE_QUERY,
+        updateNoCheck(UPDATE_QUERY,
                 newReview.getContent(),
                 newReview.getIsPositive(),
                 newReview.getUserId(),
@@ -82,7 +82,6 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
                 newReview.getUseful(),
                 newReview.getReviewId()
         );
-
         return newReview;
     }
 
