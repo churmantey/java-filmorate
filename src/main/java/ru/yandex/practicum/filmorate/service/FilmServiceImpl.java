@@ -99,6 +99,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<FilmDto> getSortedFilms(Integer directorId, String sort) {
         List<Film> films;
+        Director director = directorService.getDirector(directorId);
         if (sort.equalsIgnoreCase("year")) {
             films = filmStorage.getSortedFilmsByYear(directorId);
         } else if (sort.equalsIgnoreCase("likes")) {
