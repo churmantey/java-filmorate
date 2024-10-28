@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import ru.yandex.practicum.filmorate.dto.SearchParams;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.BaseStorage;
 
@@ -20,5 +21,15 @@ public interface FilmStorage extends BaseStorage<Film> {
     List<Integer> getFilmLikes(Integer filmId);
 
     List<Film> getFilmsLikesByUsers(Integer userId, Integer friendId);
+
+    List<Film> findFilmsBySearchParameters(SearchParams searchParams);
+
+    List<Film> getPopularFilmsByGenreAndYear(Integer genreId, Integer year, Integer count);
+
+    List<Film> getPopularFilmsByGenre(Integer genreId, Integer count);
+
+    List<Film> getPopularFilmsByYear(Integer year, Integer count);
+
+    List<Film> getRecommendedFilms(Integer userId);
 
 }
