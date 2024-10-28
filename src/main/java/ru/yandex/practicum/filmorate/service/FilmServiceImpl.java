@@ -71,8 +71,8 @@ public class FilmServiceImpl implements FilmService {
         Film film = FilmMapper.mapToFilm(updateFilmRequest);
         film.validate();
         Film oldFilm = filmStorage.getElement(film.getId());
+        directorService.deleteFilmsAndDirectors(film.getId());
         directorService.insertFilmAndDirector(film.getId(), directorsIds);
-
         return FilmMapper.mapToFilmDto(
                 filmStorage.updateElement(film)
         );
@@ -99,6 +99,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<FilmDto> getSortedFilms(Integer directorId, String sort) {
         List<Film> films;
+        Director director = directorService.getDirector(directorId);
         if (sort.equalsIgnoreCase("year")) {
             films = filmStorage.getSortedFilmsByYear(directorId);
         } else if (sort.equalsIgnoreCase("likes")) {
@@ -136,7 +137,7 @@ public class FilmServiceImpl implements FilmService {
                     .map(Director::getId)
                     .collect(Collectors.toSet());
             List<Director> directors = directorService.getDirectorByIds(directorsIds);
-            if (newFilmRequest.getDirectors().size() != directors.size()) {
+            if (directorsIds.size() != directors.size()) {
                 throw new ValidationException("Введен некорректный режиссер");
             }
             newFilmRequest.setDirectors(new LinkedHashSet<>(directors));

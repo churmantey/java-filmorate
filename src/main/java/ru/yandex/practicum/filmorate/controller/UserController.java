@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final EventService eventService;
 
     @GetMapping
     public List<UserDto> getAllUsers() {
@@ -33,6 +36,14 @@ public class UserController {
         UserDto user = userService.getUserById(userId);
         log.info("GET user RESPONSE {}", user);
         return user;
+    }
+
+    @GetMapping("/{userId}/feed")
+    public List<Event> getFeed(@PathVariable Integer userId) {
+        log.info("Пришел GET /users/{}/feed", userId);
+        List<Event> events = eventService.getEvents(userId);
+        log.info("Отправлен ответ длины {}", events.size());
+        return events;
     }
 
     @PostMapping

@@ -31,13 +31,6 @@ public final class UserMapper {
         userDto.setLogin(user.getLogin());
         userDto.setEmail(user.getEmail());
         userDto.setBirthday(user.getBirthday());
-//        if (user.getFriends() != null) {
-//            userDto.getFriends().addAll(
-//                    user.getFriends().stream()
-//                            .map(friend -> new IdEntity(friend.getId(), friend.getName()))
-//                            .toList()
-//            );
-//        }
         return userDto;
     }
 
