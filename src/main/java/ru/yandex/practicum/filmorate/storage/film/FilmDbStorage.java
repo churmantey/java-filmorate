@@ -74,21 +74,29 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             " ORDER BY countUsers DESC " +
             "LIMIT ?";
 
-    private static final String FIND_ALL_BY_TITLE_CONTEXT = "SELECT * FROM " + tableName +
-            " WHERE LOWER(films.title) LIKE ? ORDER BY title";
-    private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT * FROM films AS f" +
-            " WHERE f.id IN " +
-            "(SELECT fd.film_id FROM films_directors AS fd WHERE fd.director_id IN " +
-            "(SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
-            "ORDER BY f.title";
-    //по тесту выяснилось, что сортировать по title здесь фильмы не нужно, в остальных запросах пока оставил
-    private static final String FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT = "SELECT DISTINCT * FROM " +
-            "(SELECT f1.* FROM films f1 WHERE LOWER(f1.title) LIKE ? " +
-            "UNION " +
-            "SELECT f2.* FROM films f2 " +
-            "WHERE f2.id IN " +
+    private static final String FIND_ALL_BY_TITLE_CONTEXT = "SELECT f.*, COUNT(fl.user_id) AS likes_count " +
+            "FROM film_likes fl " +
+            "RIGHT JOIN films f ON fl.film_id = f.id " +
+            "WHERE LOWER(f.title) LIKE ? " +
+            "GROUP BY f.id " +
+            "ORDER BY likes_count DESC";
+    private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT f.*, COUNT(fl.user_id) AS likes_count " +
+            "FROM film_likes fl " +
+            "RIGHT JOIN films f ON fl.film_id = f.id " +
+            "WHERE f.id IN " +
             "(SELECT fd.film_id FROM films_directors AS fd " +
-            "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?))) AS f";
+            "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
+            "GROUP BY f.id " +
+            "ORDER BY likes_count DESC";
+    private static final String FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT =
+            "SELECT f.*, COUNT(fl.user_id) AS likes_count " +
+                    "FROM film_likes fl " +
+                    "RIGHT JOIN films f ON fl.film_id = f.id " +
+                    "WHERE (LOWER(f.title) LIKE ?) OR " +
+                    "f.id IN (SELECT fd.film_id FROM films_directors AS fd " +
+                    "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
+                    "GROUP BY f.id " +
+                    "ORDER BY likes_count DESC";
 
     private static final String FIND_RECOMMENDED_FOR_USER_QUERY = "SELECT " + fields + " FROM " + tableName + " " +
             """
