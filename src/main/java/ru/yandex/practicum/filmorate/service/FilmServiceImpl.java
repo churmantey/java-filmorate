@@ -71,6 +71,7 @@ public class FilmServiceImpl implements FilmService {
         Film film = FilmMapper.mapToFilm(updateFilmRequest);
         film.validate();
         Film oldFilm = filmStorage.getElement(film.getId());
+        directorService.deleteFilmsAndDirectors(film.getId());
         directorService.insertFilmAndDirector(film.getId(), directorsIds);
 
         return FilmMapper.mapToFilmDto(
@@ -99,6 +100,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<FilmDto> getSortedFilms(Integer directorId, String sort) {
         List<Film> films;
+        Director director = directorService.getDirector(directorId);
         if (sort.equalsIgnoreCase("year")) {
             films = filmStorage.getSortedFilmsByYear(directorId);
         } else if (sort.equalsIgnoreCase("likes")) {
