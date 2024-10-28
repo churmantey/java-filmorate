@@ -2,10 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
-import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.SearchParams;
-import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.*;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
@@ -99,6 +96,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<FilmDto> getSortedFilms(Integer directorId, String sort) {
         List<Film> films;
+        Director director = directorService.getDirector(directorId);
         if (sort.equalsIgnoreCase("year")) {
             films = filmStorage.getSortedFilmsByYear(directorId);
         } else if (sort.equalsIgnoreCase("likes")) {
@@ -155,6 +153,7 @@ public class FilmServiceImpl implements FilmService {
     public List<FilmDto> getFilmsByContext(String query, String criterion) {
         SearchParams searchParams = new SearchParams(query, criterion);
         return filmStorage.findFilmsBySearchParameters(searchParams).stream()
+                .sorted(Comparator.comparing(film-> film.getMpa().getId()))
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }

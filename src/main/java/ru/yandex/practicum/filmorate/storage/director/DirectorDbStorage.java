@@ -27,6 +27,7 @@ public class DirectorDbStorage extends BaseDbStorage<Director> implements Direct
     private static final String MERGE_QUERY = "MERGE INTO films_directors KEY(film_id, director_id) VALUES(?, ?)";
     private static final String GET_DIRECTORS_FOR_ONE_FILM = "SELECT * FROM DIRECTORS WHERE id IN " +
             "(SELECT director_id FROM FILMS_DIRECTORS fd WHERE film_id = ?)";
+    private static final String DELETE_FILM_DIRECTORS = "DELETE FROM films_directors WHERE film_id = ?";
 
     public DirectorDbStorage(JdbcTemplate jdbcTemplate, RowMapper<Director> mapper) {
         super(jdbcTemplate, mapper);
@@ -81,6 +82,7 @@ public class DirectorDbStorage extends BaseDbStorage<Director> implements Direct
 
     @Override
     public void insertFilmAndDirectors(Integer filmId, Set<Integer> directorIds) {
+        delete(DELETE_FILM_DIRECTORS, filmId);
         jdbcTemplate.batchUpdate(
                 MERGE_QUERY,
 

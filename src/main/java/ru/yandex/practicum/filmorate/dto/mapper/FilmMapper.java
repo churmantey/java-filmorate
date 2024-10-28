@@ -6,6 +6,9 @@ import ru.yandex.practicum.filmorate.dto.IdEntity;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+
+import java.util.Comparator;
 
 @NoArgsConstructor
 public final class FilmMapper {
@@ -56,6 +59,7 @@ public final class FilmMapper {
             filmDto.getGenres().addAll(
                     film.getGenres().stream()
                             .map(genre -> new IdEntity(genre.getId(), genre.getName()))
+                            .sorted(Comparator.comparing(IdEntity::getId))
                             .toList());
         }
 

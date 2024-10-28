@@ -75,20 +75,20 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "LIMIT ?";
 
     private static final String FIND_ALL_BY_TITLE_CONTEXT = "SELECT * FROM " + tableName +
-            " WHERE LOCATE(?, title) > 0 ORDER BY title";
+            " WHERE LOWER(films.title) LIKE ? ORDER BY title";
     private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT * FROM films AS f" +
             " WHERE f.id IN " +
             "(SELECT fd.film_id FROM films_directors AS fd WHERE fd.director_id IN " +
-            "(SELECT d.id FROM directors AS d WHERE LOCATE(?, d.name) > 0)) " +
+            "(SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
             "ORDER BY f.title";
     //по тесту выяснилось, что сортировать по title здесь фильмы не нужно, в остальных запросах пока оставил
     private static final String FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT = "SELECT DISTINCT * FROM " +
-            "(SELECT f1.* FROM films f1 WHERE LOCATE(?, f1.title) > 0 " +
+            "(SELECT f1.* FROM films f1 WHERE LOWER(f1.title) LIKE ? " +
             "UNION " +
             "SELECT f2.* FROM films f2 " +
             "WHERE f2.id IN " +
             "(SELECT fd.film_id FROM films_directors AS fd " +
-            "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOCATE(?, d.name) > 0))) AS f";
+            "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?))) AS f";
 
     private static final String FIND_RECOMMENDED_FOR_USER_QUERY = "SELECT " + fields + " FROM " + tableName + " " +
             """
@@ -281,6 +281,8 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public List<Film> getRecommendedFilms(Integer userId) {
-        return findMany(FIND_RECOMMENDED_FOR_USER_QUERY, userId, userId, userId);
+        List<Film> films = findMany(FIND_RECOMMENDED_FOR_USER_QUERY, userId, userId, userId);
+        films.forEach(this::setFilmMpaAndGenresAndDirectors);
+        return films;
     }
 }
