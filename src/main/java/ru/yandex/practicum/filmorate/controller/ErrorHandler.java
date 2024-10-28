@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -17,7 +18,8 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage(), "Not found");
     }
 
-    @ExceptionHandler({NullObjectException.class, ValidationException.class, IllegalArgumentException.class})
+    @ExceptionHandler({NullObjectException.class, ValidationException.class, IllegalArgumentException.class,
+                       ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNullObjectException(final RuntimeException e) {
         return new ErrorResponse(e.getMessage(), "Bad request");
@@ -28,6 +30,5 @@ public class ErrorHandler {
     public ErrorResponse handleOtherException(final RuntimeException e) {
         return new ErrorResponse(e.getMessage(), "Internal server error");
     }
-
 
 }

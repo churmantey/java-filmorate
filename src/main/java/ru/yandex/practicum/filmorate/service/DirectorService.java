@@ -24,6 +24,8 @@ public interface DirectorService {
 
     void insertFilmAndDirector(Integer filmId, Set<Integer> directorIds);
 
+    void deleteFilmsAndDirectors(Integer filmId);
+
 }
 
 

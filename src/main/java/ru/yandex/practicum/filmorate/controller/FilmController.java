@@ -1,18 +1,22 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.validators.SearchParametersConstraint;
 
 import java.util.List;
 
 @Slf4j
 @RestController
+@Validated
 @RequestMapping("/films")
 @RequiredArgsConstructor
 public class FilmController {
@@ -70,4 +74,14 @@ public class FilmController {
         log.info("GET commonFilms films {}", commonFilms);
         return commonFilms;
     }
+
+    @GetMapping("/search")
+    public List<FilmDto> searchByContext(@Valid @RequestParam(name = "query") @NotEmpty String query,
+                                         @Valid @RequestParam(name = "by") @SearchParametersConstraint String find) {
+        log.info("Search films by context {} params {}", query, find);
+        List<FilmDto> foundFilms = filmService.getFilmsByContext(query, find);
+        log.info("{} films was found", foundFilms.size());
+        return foundFilms;
+    }
+
 }
