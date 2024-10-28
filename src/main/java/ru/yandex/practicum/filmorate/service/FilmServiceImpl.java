@@ -71,6 +71,7 @@ public class FilmServiceImpl implements FilmService {
         Film film = FilmMapper.mapToFilm(updateFilmRequest);
         film.validate();
         Film oldFilm = filmStorage.getElement(film.getId());
+        directorService.deleteFilmsAndDirectors(film.getId());
         directorService.insertFilmAndDirector(film.getId(), directorsIds);
 
         return FilmMapper.mapToFilmDto(

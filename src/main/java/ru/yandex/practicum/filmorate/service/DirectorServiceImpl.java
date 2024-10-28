@@ -57,6 +57,11 @@ public class DirectorServiceImpl implements DirectorService {
     }
 
     @Override
+    public void deleteFilmsAndDirectors(Integer filmId) {
+        directorStorage.deleteFilmsAndDirectors(filmId);
+    }
+
+    @Override
     public List<Director> getAllDirectorForOneFilm(Integer id) {
         return directorStorage.getDirectorsByFilmId(id);
     }
