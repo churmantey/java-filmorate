@@ -79,7 +79,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "RIGHT JOIN films f ON fl.film_id = f.id " +
             "WHERE LOWER(f.title) LIKE ? " +
             "GROUP BY f.id " +
-            "ORDER BY likes_count DESC, f.rating_id";
+            "ORDER BY likes_count DESC";
     private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT f.*, COUNT(fl.user_id) AS likes_count " +
             "FROM film_likes fl " +
             "RIGHT JOIN films f ON fl.film_id = f.id " +
@@ -87,7 +87,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "(SELECT fd.film_id FROM films_directors AS fd " +
             "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
             "GROUP BY f.id " +
-            "ORDER BY likes_count DESC, f.rating_id";
+            "ORDER BY likes_count DESC";
     private static final String FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT =
             "SELECT f.*, COUNT(fl.user_id) AS likes_count " +
                     "FROM film_likes fl " +
@@ -96,7 +96,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                     "f.id IN (SELECT fd.film_id FROM films_directors AS fd " +
                     "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
                     "GROUP BY f.id " +
-                    "ORDER BY likes_count DESC, f.rating_id";
+                    "ORDER BY likes_count DESC";
 
     private static final String FIND_RECOMMENDED_FOR_USER_QUERY = "SELECT " + fields + " FROM " + tableName + " " +
             """
