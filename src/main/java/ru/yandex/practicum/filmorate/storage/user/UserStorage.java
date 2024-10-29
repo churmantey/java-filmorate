@@ -15,4 +15,6 @@ public interface UserStorage extends BaseStorage<User> {
 
     List<User> getUserFriends(Integer userId);
 
+    List<User> getUserLikesByFilmId(Integer filmId);
+
 }

@@ -65,6 +65,13 @@ public final class FilmMapper {
                             .toList()
             );
         }
+        if (film.getLikes() != null) {
+            filmDto.getLikes().addAll(
+                    film.getLikes().stream()
+                            .map(user -> new IdEntity(user.getId(), user.getName()))
+                            .toList()
+            );
+        }
         return filmDto;
     }
 
