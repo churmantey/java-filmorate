@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
 
@@ -117,16 +118,19 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
     private final DirectorStorage directorStorage;
+    private final UserStorage userStorage;
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate,
                          RowMapper<Film> mapper,
                          GenreStorage genreStorage,
                          RatingStorage ratingStorage,
-                         DirectorStorage directorStorage) {
+                         DirectorStorage directorStorage,
+                         UserStorage userStorage) {
         super(jdbcTemplate, mapper);
         this.genreStorage = genreStorage;
         this.ratingStorage = ratingStorage;
         this.directorStorage = directorStorage;
+        this.userStorage = userStorage;
     }
 
     @Override
@@ -178,7 +182,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public List<Film> getTopRatedFilms(int count) {
         List<Film> films = findMany(FIND_TOP_RATED_QUERY, count);
-        films.forEach(this::setFilmMpaAndGenresAndDirectors);
+        films.forEach(this::setFilmMpaGenresDirectorsLikes);
         return films;
     }
 
@@ -199,7 +203,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public List<Film> getAllElements() {
         List<Film> baseList = findMany(FIND_ALL_QUERY);
-        baseList.forEach(this::setFilmMpaAndGenresAndDirectors);
+        baseList.forEach(this::setFilmMpaGenresDirectorsLikes);
         return baseList;
     }
 
@@ -207,29 +211,30 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     public Film getElement(Integer id) {
         Film film = findOne(FIND_BY_ID_QUERY, id)
                 .orElseThrow(() -> new NotFoundException("Не найден фильм с id = " + id));
-        setFilmMpaAndGenresAndDirectors(film);
+        setFilmMpaGenresDirectorsLikes(film);
         return film;
     }
 
     @Override
     public List<Film> getSortedFilmsByYear(Integer id) {
         List<Film> films = findMany(GET_SORTED_FILMS_BY_YEAR, id);
-        films.forEach(this::setFilmMpaAndGenresAndDirectors);
+        films.forEach(this::setFilmMpaGenresDirectorsLikes);
         return films;
     }
 
     @Override
     public List<Film> getSortedFilmsByLikes(Integer id) {
         List<Film> films = findMany(GET_SORTED_FILMS_BY_LIKES, id);
-        films.forEach(this::setFilmMpaAndGenresAndDirectors);
+        films.forEach(this::setFilmMpaGenresDirectorsLikes);
         return films;
     }
 
-    // заполняет коллекции жанров в фильме по данным из БД
-    private void setFilmMpaAndGenresAndDirectors(Film film) {
+    // заполняет в фильме рейтинг, коллекции жанров, режиссеров и лайков по данным из БД
+    private void setFilmMpaGenresDirectorsLikes(Film film) {
         film.setMpa(ratingStorage.getElement(film.getMpa().getId()));
         film.getGenres().addAll(genreStorage.getFilmGenresById(film.getId()));
         film.getDirectors().addAll(directorStorage.getDirectorsByFilmId(film.getId()));
+        film.getLikes().addAll(userStorage.getUserLikesByFilmId(film.getId()));
     }
 
     //добавляет жанры фильма в БД
@@ -262,33 +267,35 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             baseList = findMany(FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT,
                     searchParams.getQuery(), searchParams.getQuery());
         }
-        baseList.forEach(this::setFilmMpaAndGenresAndDirectors);
+        baseList.forEach(this::setFilmMpaGenresDirectorsLikes);
         return baseList;
     }
 
     @Override
     public List<Film> getPopularFilmsByGenreAndYear(Integer genreId, Integer year, Integer count) {
         List<Film> films = findMany(FIND_TOP_RATED_QUERY_BY_GENRE_AND_YEAR, genreId, year, count);
-        films.forEach(this::setFilmMpaAndGenresAndDirectors);
+        films.forEach(this::setFilmMpaGenresDirectorsLikes);
         return films;
     }
 
     @Override
     public List<Film> getPopularFilmsByGenre(Integer genreId, Integer count) {
         List<Film> films = findMany(FIND_TOP_RATED_QUERY_BY_GENRE, genreId, count);
-        films.forEach(this::setFilmMpaAndGenresAndDirectors);
+        films.forEach(this::setFilmMpaGenresDirectorsLikes);
         return films;
     }
 
     @Override
     public List<Film> getPopularFilmsByYear(Integer year, Integer count) {
         List<Film> films = findMany(FIND_TOP_RATED_QUERY_BY_YEAR, year, count);
-        films.forEach(this::setFilmMpaAndGenresAndDirectors);
+        films.forEach(this::setFilmMpaGenresDirectorsLikes);
         return films;
     }
 
     @Override
     public List<Film> getRecommendedFilms(Integer userId) {
-        return findMany(FIND_RECOMMENDED_FOR_USER_QUERY, userId, userId, userId);
+        List<Film> films = findMany(FIND_RECOMMENDED_FOR_USER_QUERY, userId, userId, userId);
+        films.forEach(this::setFilmMpaGenresDirectorsLikes);
+        return films;
     }
 }
