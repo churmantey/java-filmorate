@@ -23,12 +23,16 @@ public class RatingController {
     @GetMapping
     public List<Rating> getAllMpa() {
         log.info("GET all ratings");
-        return ratingService.getAllMpa();
+        List<Rating> ratings = ratingService.getAllMpa();
+        log.info("Got list of all ratings");
+        return ratings;
     }
 
     @GetMapping("/{ratingId}")
-    public Rating getMpa(@PathVariable Integer ratingId) {
+    public Rating getMpaById(@PathVariable Integer ratingId) {
         log.info("GET rating {}", ratingId);
-        return ratingService.getMpaById(ratingId);
+        Rating rating = ratingService.getMpaById(ratingId);
+        log.info("Got {}", rating);
+        return rating;
     }
 }

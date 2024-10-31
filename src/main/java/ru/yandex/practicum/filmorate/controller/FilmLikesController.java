@@ -21,7 +21,9 @@ public class FilmLikesController {
     public FilmDto addLike(@PathVariable Integer id,
                            @PathVariable Integer userId) {
         log.info("PUT add like film {} , user {}", id, userId);
-        return filmLikesService.addLike(id, userId);
+        FilmDto filmDto = filmLikesService.addLike(id, userId);
+        log.info("К film {} добавлен лайк user {}", id, userId);
+        return filmDto;
     }
 
     //DELETE /films/{id}/like/{userId}
@@ -29,7 +31,9 @@ public class FilmLikesController {
     public FilmDto removeLike(@PathVariable Integer id,
                               @PathVariable Integer userId) {
         log.info("DELETE like film {} , user {}", id, userId);
-        return filmLikesService.removeLike(id, userId);
+        FilmDto filmDto = filmLikesService.removeLike(id, userId);
+        log.info("Удален лайк film {} от user {}", id, userId);
+        return filmDto;
     }
 
     //GET /films/popular?count={limit}&genreId={genreId}&year={year}
@@ -38,16 +42,8 @@ public class FilmLikesController {
                                                   @RequestParam(required = false) Integer genreId,
                                                   @RequestParam(required = false) Integer year) {
         log.info("GET first {} popular films by genre {} and year {}", count, genreId, year);
-        if (genreId == null && year == null) {
-            return filmLikesService.getPopular(count);
-        }
-        if (genreId != null && year == null) {
-            return filmLikesService.getPopularFilmsByGenre(genreId, count);
-        }
-        if (genreId == null && year != null) {
-            return filmLikesService.getPopularFilmsByYear(year, count);
-        }
-        return filmLikesService.getPopularFilmsByGenreAndYear(genreId, year, count);
-
+        List<FilmDto> resList = filmLikesService.getPopularByYearAndGenre(count, genreId, year);
+        log.info("Получены first {} popular films by genre {} and year {}", count, genreId, year);
+        return resList;
     }
 }

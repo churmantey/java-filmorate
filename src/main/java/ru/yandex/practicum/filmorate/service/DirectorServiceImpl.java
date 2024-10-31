@@ -15,7 +15,7 @@ public class DirectorServiceImpl implements DirectorService {
     private final DirectorStorage directorStorage;
 
     @Override
-    public List<Director> getAll() {
+    public List<Director> getAllDirectors() {
         return directorStorage.getAllElements();
     }
 

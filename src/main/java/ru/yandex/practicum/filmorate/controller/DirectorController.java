@@ -20,7 +20,7 @@ public class DirectorController {
     @GetMapping
     public List<Director> getAllDirectors() {
         log.info("Пришел GET запрос /directors");
-        List<Director> response = directorService.getAll();
+        List<Director> response = directorService.getAllDirectors();
         log.info("Отправлен ответ GET /directors с телом {}", response);
         return response;
 
