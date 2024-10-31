@@ -1,24 +1,25 @@
 package ru.yandex.practicum.filmorate.service;
 
+import ru.yandex.practicum.filmorate.dto.DirectorDto;
 import ru.yandex.practicum.filmorate.model.Director;
 
 import java.util.List;
 import java.util.Set;
 
 public interface DirectorService {
-    List<Director> getAllDirectors();
+    List<DirectorDto> getAllDirectors();
 
-    List<Director> getAllDirectorForOneFilm(Integer id);
+    List<DirectorDto> getAllDirectorForOneFilm(Integer id);
 
-    Director createDirector(Director director);
+    DirectorDto createDirector(DirectorDto directorDto);
 
-    Director getDirector(Integer id);
+    DirectorDto getDirector(Integer id);
 
-    Director updateDirector(Director director);
+    DirectorDto updateDirector(DirectorDto directorDto);
 
     boolean deleteDirector(Integer id);
 
-    List<Director> getDirectorByIds(Set<Integer> directorIds);
+    List<DirectorDto> getDirectorByIds(Set<Integer> directorIds);
 
     Set<Integer> getDirectorsIdsOfFilm(Integer id);
 

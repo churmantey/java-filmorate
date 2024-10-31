@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.DirectorDto;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.DirectorService;
 
@@ -18,34 +19,34 @@ public class DirectorController {
     private final DirectorService directorService;
 
     @GetMapping
-    public List<Director> getAllDirectors() {
+    public List<DirectorDto> getAllDirectors() {
         log.info("Пришел GET запрос /directors");
-        List<Director> response = directorService.getAllDirectors();
+        List<DirectorDto> response = directorService.getAllDirectors();
         log.info("Отправлен ответ GET /directors с телом {}", response);
         return response;
 
     }
 
     @GetMapping("/{id}")
-    public Director getDirector(@PathVariable Integer id) {
+    public DirectorDto getDirector(@PathVariable Integer id) {
         log.info("Пришел GET запрос /directors/{}", id);
-        Director response = directorService.getDirector(id);
+        DirectorDto response = directorService.getDirector(id);
         log.info("Отправлен GET ответ /directors/{} с телом  {}", id, response);
         return response;
     }
 
     @PostMapping
-    public Director createDirector(@Valid @RequestBody Director director) {
-        log.info("Пришел POST запрос /directors с телом {}", director);
-        Director response = directorService.createDirector(director);
-        log.info("Отправлен POST ответ /directors с телом {}", director);
+    public DirectorDto createDirector(@Valid @RequestBody DirectorDto directorDto) {
+        log.info("Пришел POST запрос /directors с телом {}", directorDto);
+        DirectorDto response = directorService.createDirector(directorDto);
+        log.info("Отправлен POST ответ /directors с телом {}", response);
         return response;
     }
 
     @PutMapping
-    public Director updateDirector(@Valid @RequestBody Director director) {
-        log.info("Пришел PUT запрос /directors c телом {}", director);
-        Director response = directorService.updateDirector(director);
+    public DirectorDto updateDirector(@Valid @RequestBody DirectorDto directorDto) {
+        log.info("Пришел PUT запрос /directors c телом {}", directorDto);
+        DirectorDto response = directorService.updateDirector(directorDto);
         log.info("Отправлен PUT запрос /directors с телом {}", response);
         return response;
     }
