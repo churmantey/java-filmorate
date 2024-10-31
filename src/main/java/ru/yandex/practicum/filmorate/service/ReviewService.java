@@ -6,13 +6,13 @@ import ru.yandex.practicum.filmorate.model.Review;
 import java.util.List;
 
 public interface ReviewService {
-    ReviewDto get(Integer id);
+    ReviewDto getReviewById(Integer id);
 
     List<ReviewDto> getByFilmId(Integer filmId, Integer count);
 
-    ReviewDto create(Review review);
+    ReviewDto createReview(Review review);
 
-    ReviewDto update(Review review);
+    ReviewDto updateReview(Review review);
 
-    boolean delete(Integer id);
+    boolean deleteReview(Integer id);
 }

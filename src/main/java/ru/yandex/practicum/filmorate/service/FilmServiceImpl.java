@@ -97,7 +97,7 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public List<FilmDto> getSortedFilms(Integer directorId, String sort) {
+    public List<FilmDto> getFilmsByDirectorSorted(Integer directorId, String sort) {
         List<Film> films;
         Director director = directorService.getDirector(directorId);
         if (sort.equalsIgnoreCase("year")) {
@@ -108,7 +108,6 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException("Введен некорректный фильтр сортировки");
         }
 
-        System.out.println(films);
         return films.stream()
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
@@ -146,6 +145,7 @@ public class FilmServiceImpl implements FilmService {
         return new LinkedHashSet<>();
     }
 
+    @Override
     public List<FilmDto> getCommonFilmsLikesByUsers(Integer userId, Integer friendId) {
         return filmStorage.getFilmsLikesByUsers(userId, friendId).stream()
                 .map(FilmMapper::mapToFilmDto)

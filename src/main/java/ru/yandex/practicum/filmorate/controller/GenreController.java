@@ -23,12 +23,16 @@ public class GenreController {
     @GetMapping
     public List<Genre> getAllGenres() {
         log.info("GET all genres");
-        return genreService.getAllGenres();
+        List<Genre> genres = genreService.getAllGenres();
+        log.info("Got list of all genres");
+        return genres;
     }
 
     @GetMapping("/{genreId}")
-    public Genre getGenre(@PathVariable Integer genreId) {
+    public Genre getGenreById(@PathVariable Integer genreId) {
         log.info("GET genre {}", genreId);
-        return genreService.getGenreById(genreId);
+        Genre genre = genreService.getGenreById(genreId);
+        log.info("Got {}", genre);
+        return genre;
     }
 }

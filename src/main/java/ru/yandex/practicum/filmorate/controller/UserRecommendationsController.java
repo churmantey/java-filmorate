@@ -21,7 +21,7 @@ public class UserRecommendationsController {
 
     //GET /users/{id}/recommendations
     @GetMapping("/{userId}/recommendations")
-    public List<FilmDto> getUserRecommendations(@PathVariable Integer userId) {
+    public List<FilmDto> getRecommendedFilms(@PathVariable Integer userId) {
         log.info("GET user {} recommendations", userId);
         List<FilmDto> filmList = userRecommendationsService.getRecommendedFilms(userId);
         log.info("GET RESPONSE user {} recommendations {}", userId, filmList);

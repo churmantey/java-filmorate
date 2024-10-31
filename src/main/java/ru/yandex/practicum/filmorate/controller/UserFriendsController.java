@@ -21,7 +21,9 @@ public class UserFriendsController {
     public UserDto addFriend(@PathVariable Integer id,
                              @PathVariable Integer friendId) {
         log.info("PUT add friend {} for user {}", friendId, id);
-        return userFriendsService.addFriend(id, friendId);
+        UserDto userDto = userFriendsService.addFriend(id, friendId);
+        log.info("Added friend {} for user {}", friendId, id);
+        return userDto;
     }
 
     //DELETE /users/{id}/friends/{friendId}
@@ -29,14 +31,18 @@ public class UserFriendsController {
     public UserDto removeFriend(@PathVariable Integer id,
                                 @PathVariable Integer friendId) {
         log.info("DELETE friend {} from user {} ", friendId, id);
-        return userFriendsService.removeFriend(id, friendId);
+        UserDto userDto = userFriendsService.removeFriend(id, friendId);
+        log.info("Deleted friend {} from user {} ", friendId, id);
+        return userDto;
     }
 
     //GET /users/{id}/friends
     @GetMapping("/{id}/friends")
     public List<UserDto> getUserFriends(@PathVariable Integer id) {
         log.info("GET user {} friends", id);
-        return userFriendsService.getUserFriends(id);
+        List<UserDto> friendsList = userFriendsService.getUserFriends(id);
+        log.info("Got list of users {} friends", id);
+        return friendsList;
     }
 
     //GET /users/{id}/friends/common/{otherId}
@@ -44,6 +50,8 @@ public class UserFriendsController {
     public List<UserDto> getCommonFriends(@PathVariable Integer id,
                                           @PathVariable Integer otherId) {
         log.info("GET mutual friends of user {} and user {}", id, otherId);
-        return userFriendsService.getCommonFriends(id, otherId);
+        List<UserDto> friendsList = userFriendsService.getCommonFriends(id, otherId);
+        log.info("Got list of mutual friends of user {} and user {}", id, otherId);
+        return friendsList;
     }
 }

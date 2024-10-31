@@ -25,7 +25,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final EventService eventService;
 
     @Override
-    public ReviewDto get(Integer id) {
+    public ReviewDto getReviewById(Integer id) {
         log.info("Getting review by id: {}", id);
         return ReviewMapper.mapToReviewDto(storage.getElement(id));
     }
@@ -53,7 +53,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewDto create(Review review) {
+    public ReviewDto createReview(Review review) {
         log.info("Making checks for user and film");
         userAndFilmCheck(review);
 
@@ -69,7 +69,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewDto update(Review newReview) {
+    public ReviewDto updateReview(Review newReview) {
         log.info("Update review: {}", newReview);
         Review review = storage.getElement(newReview.getReviewId());
 
@@ -82,7 +82,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public boolean delete(Integer id) {
+    public boolean deleteReview(Integer id) {
         log.info("Delete review by id: {}", id);
         Review review = storage.getElement(id);
         eventService.createEvent(review.getUserId(), EventType.REVIEW, EventOperation.REMOVE, id);

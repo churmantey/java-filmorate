@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -62,5 +63,19 @@ public class FilmLikesServiceImpl implements FilmLikesService {
     public List<FilmDto> getPopularFilmsByYear(Integer year, Integer count) {
         return filmStorage.getPopularFilmsByYear(year, count).stream()
                 .map(FilmMapper::mapToFilmDto).toList();
+    }
+
+    @Override
+    public List<FilmDto> getPopularByYearAndGenre(int count, Integer genreId, Integer year){
+        List<FilmDto> resList = new ArrayList<>();
+        if (genreId == null && year == null) {
+            resList = getPopular(count);
+        } else if (genreId != null && year == null) {
+            resList = getPopularFilmsByGenre(genreId, count);
+        } else if (genreId == null && year != null) {
+            resList = getPopularFilmsByYear(year, count);
+        } else
+            resList = getPopularFilmsByGenreAndYear(genreId, year, count);
+        return resList;
     }
 }

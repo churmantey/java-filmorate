@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable Integer userId) {
+    public UserDto getUserById(@PathVariable Integer userId) {
         log.info("GET user {}", userId);
         UserDto user = userService.getUserById(userId);
         log.info("GET user RESPONSE {}", user);
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/feed")
-    public List<Event> getFeed(@PathVariable Integer userId) {
+    public List<Event> getEvents(@PathVariable Integer userId) {
         log.info("Пришел GET /users/{}/feed", userId);
         List<Event> events = eventService.getEvents(userId);
         log.info("Отправлен ответ длины {}", events.size());
@@ -47,21 +47,27 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@Valid @RequestBody NewUserRequest newUserRequest) {
+    public UserDto createUser(@Valid @RequestBody NewUserRequest newUserRequest) {
         log.info("POST user {}", newUserRequest);
-        return userService.createUser(newUserRequest);
+        UserDto userDto = userService.createUser(newUserRequest);
+        log.info("Was created user {}", userDto);
+        return userDto;
     }
 
     @PutMapping
-    public UserDto update(@Valid @RequestBody UpdateUserRequest updateUserRequest) {
+    public UserDto updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest) {
         log.info("PUT user {}", updateUserRequest);
-        return userService.updateUser(updateUserRequest);
+        UserDto userDto = userService.updateUser(updateUserRequest);
+        log.info("Was updated user {}", userDto);
+        return userDto;
     }
 
     @DeleteMapping("/{userId}")
-    public boolean delete(@PathVariable Integer userId) {
+    public boolean deleteUserById(@PathVariable Integer userId) {
         log.info("DELETE user {}", userId);
         UserDto user = userService.getUserById(userId);
-        return userService.deleteUserById(user.getId());
+        boolean result = userService.deleteUserById(user.getId());
+        log.info("Was deleted user {}", userId);
+        return result;
     }
 }

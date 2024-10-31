@@ -32,7 +32,7 @@ public class FilmController {
     }
 
     @GetMapping("/{filmId}")
-    public FilmDto getFilm(@PathVariable Integer filmId) {
+    public FilmDto getFilmById(@PathVariable Integer filmId) {
         log.info("GET film {}", filmId);
         FilmDto filmDto = filmService.getFilmById(filmId);
         log.info("GET film RESPONSE {}", filmDto);
@@ -43,32 +43,38 @@ public class FilmController {
     public List<FilmDto> getFilmsByDirectorSorted(@PathVariable Integer directorId,
                                                   @RequestParam(name = "sortBy") String sort) {
         log.info("Пришел GET запрос /films/director/{} с сортировкой по {}", directorId, sort);
-        List<FilmDto> films = filmService.getSortedFilms(directorId, sort);
+        List<FilmDto> films = filmService.getFilmsByDirectorSorted(directorId, sort);
         log.info("Отправлен GET ответ с телом {}", films);
         return films;
     }
 
     @PostMapping
-    public FilmDto create(@Valid @RequestBody NewFilmRequest newFilmRequest) {
+    public FilmDto createFilm(@Valid @RequestBody NewFilmRequest newFilmRequest) {
         log.info("POST film {}", newFilmRequest);
-        return filmService.createFilm(newFilmRequest);
+        FilmDto filmDto = filmService.createFilm(newFilmRequest);
+        log.info("Добавлен film {}", filmDto);
+        return filmDto;
     }
 
     @PutMapping
-    public FilmDto update(@Valid @RequestBody UpdateFilmRequest updateFilmRequest) {
+    public FilmDto updateFilm(@Valid @RequestBody UpdateFilmRequest updateFilmRequest) {
         log.info("PUT film {}", updateFilmRequest);
-        return filmService.updateFilm(updateFilmRequest);
+        FilmDto filmDto = filmService.updateFilm(updateFilmRequest);
+        log.info("Изменен film {}", filmDto);
+        return filmDto;
     }
 
     @DeleteMapping("/{filmId}")
-    public boolean delete(@PathVariable Integer filmId) {
+    public boolean deleteFilmById(@PathVariable Integer filmId) {
         log.info("DELETE film {}", filmId);
         FilmDto film = filmService.getFilmById(filmId);
-        return filmService.deleteFilmById(film.getId());
+        boolean result = filmService.deleteFilmById(film.getId());
+        log.info("Результат удаления {}", result);
+        return result;
     }
 
     @GetMapping("/common")
-    public List<FilmDto> getCommonFilms(@RequestParam Integer userId, @RequestParam Integer friendId) {
+    public List<FilmDto> getCommonFilmsLikesByUsers(@RequestParam Integer userId, @RequestParam Integer friendId) {
         log.info("GET commonFilms from userId {}, friendId {}", userId, friendId);
         List<FilmDto> commonFilms = filmService.getCommonFilmsLikesByUsers(userId, friendId);
         log.info("GET commonFilms films {}", commonFilms);
@@ -76,7 +82,7 @@ public class FilmController {
     }
 
     @GetMapping("/search")
-    public List<FilmDto> searchByContext(@Valid @RequestParam(name = "query") @NotEmpty String query,
+    public List<FilmDto> getFilmsByContext(@Valid @RequestParam(name = "query") @NotEmpty String query,
                                          @Valid @RequestParam(name = "by") @SearchParametersConstraint String find) {
         log.info("Search films by context {} params {}", query, find);
         List<FilmDto> foundFilms = filmService.getFilmsByContext(query, find);

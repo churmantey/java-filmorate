@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface DirectorService {
-    List<Director> getAll();
+    List<Director> getAllDirectors();
 
     List<Director> getAllDirectorForOneFilm(Integer id);
 
