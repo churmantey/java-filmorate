@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 public class ReviewRatingServiceImpl implements ReviewRatingService {
     private final ReviewStorage storage;
     private final ReviewRatingStorage ratingStorage;
+    private final ReviewMapper reviewMapper;
 
     private static final String RATING_TYPE_LIKE = "LIKE";
     private static final String RATING_TYPE_DISLIKE = "DISLIKE";
@@ -42,7 +43,7 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
         storage.updateElement(review);
 
         log.info("Returning updated review = {}", review);
-        return ReviewMapper.mapToReviewDto(review);
+        return reviewMapper.toDto(review);
     }
 
     @Override
@@ -68,7 +69,7 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
         storage.updateElement(review);
 
         log.info("Returning updated review = {}", review);
-        return ReviewMapper.mapToReviewDto(review);
+        return reviewMapper.toDto(review);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
         storage.updateElement(review);
 
         log.info("Returning updated review = {}", review);
-        return ReviewMapper.mapToReviewDto(review);
+        return reviewMapper.toDto(review);
     }
 
     @Override
@@ -96,6 +97,6 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
         storage.updateElement(review);
 
         log.info("Returning updated review = {}", review);
-        return ReviewMapper.mapToReviewDto(review);
+        return reviewMapper.toDto(review);
     }
 }
