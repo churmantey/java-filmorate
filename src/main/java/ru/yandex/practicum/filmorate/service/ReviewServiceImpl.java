@@ -23,11 +23,12 @@ public class ReviewServiceImpl implements ReviewService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final EventService eventService;
+    private final ReviewMapper reviewMapper;
 
     @Override
     public ReviewDto getReviewById(Integer id) {
         log.info("Getting review by id: {}", id);
-        return ReviewMapper.mapToReviewDto(storage.getElement(id));
+        return reviewMapper.toDto(storage.getElement(id));
     }
 
     @Override
@@ -43,13 +44,10 @@ public class ReviewServiceImpl implements ReviewService {
         log.info("Checking filmId: {}", filmId);
         if (filmId == 0) {
             log.info("FilmId is null, returning 10 most rated films");
-            return storage.getByFilm(count).stream()
-                    .map(ReviewMapper::mapToReviewDto).toList();
+            return reviewMapper.toDtoList(storage.getByFilm(count));
         }
 
-        return storage.getByFilm(filmId, count)
-                .stream()
-                .map(ReviewMapper::mapToReviewDto).toList();
+        return reviewMapper.toDtoList(storage.getByFilm(filmId, count));
     }
 
     @Override
@@ -63,7 +61,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         log.info("Creating new review instance in database");
-        ReviewDto reviewDto = ReviewMapper.mapToReviewDto(storage.addElement(review));
+        ReviewDto reviewDto = reviewMapper.toDto(storage.addElement(review));
         eventService.createEvent(review.getUserId(), EventType.REVIEW, EventOperation.ADD, review.getReviewId());
         return reviewDto;
     }
@@ -78,7 +76,7 @@ public class ReviewServiceImpl implements ReviewService {
         review.setIsPositive(newReview.getIsPositive());
 
         eventService.createEvent(review.getUserId(), EventType.REVIEW, EventOperation.UPDATE, review.getReviewId());
-        return ReviewMapper.mapToReviewDto(storage.updateElement(review));
+        return reviewMapper.toDto(storage.updateElement(review));
     }
 
     @Override
