@@ -41,7 +41,7 @@ public class UserTests {
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(1, violations.size(),
                 "Неожиданное количество нарушений при валидации пустого логина");
-        assertEquals("Логин не дожен быть пустым и содержать пробелы или спецсимволы",
+        assertEquals("Логин не должен быть пустым и содержать пробелы или спецсимволы",
                 violations.stream().findFirst().get().getMessage());
     }
 

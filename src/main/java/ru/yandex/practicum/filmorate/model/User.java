@@ -11,7 +11,7 @@ public class User {
     private Integer id;
 
     @NotNull
-    @Pattern(regexp = "(\\w)+", message = "Логин не до должен быть пустым и содержать пробелы или спецсимволы")
+    @Pattern(regexp = "(\\w)+", message = "Логин не должен быть пустым и содержать пробелы или спецсимволы")
     private String login;
 
     private String name;
