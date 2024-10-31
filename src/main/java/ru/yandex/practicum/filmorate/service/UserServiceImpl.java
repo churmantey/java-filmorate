@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.dto.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.dto.mapper.UserMapperStruct;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -18,6 +19,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
+    private final UserMapperStruct userMapperStruct;
 
     @Override
     public UserDto getUserById(Integer userId) {
@@ -34,7 +36,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(NewUserRequest newUserRequest) {
         User user = UserMapper.mapToUser(newUserRequest);
-        return UserMapper.mapToUserDto(
+        return userMapperStruct.mapUserToUserDto(
                 userStorage.addElement(user)
         );
     }
@@ -43,7 +45,7 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(UpdateUserRequest updateUserRequest) {
         User newUser = UserMapper.mapToUser(updateUserRequest);
         User user = userStorage.getElement(newUser.getId());
-        return UserMapper.mapToUserDto(userStorage.updateElement(newUser));
+        return userMapperStruct.mapUserToUserDto(userStorage.updateElement(newUser));
     }
 
     @Override
@@ -58,9 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userStorage.getAllElements().stream()
-                .map(UserMapper::mapToUserDto)
-                .toList();
+        return userMapperStruct.map(userStorage.getAllElements());
     }
 
 }
