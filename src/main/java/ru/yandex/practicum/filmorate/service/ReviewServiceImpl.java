@@ -35,13 +35,13 @@ public class ReviewServiceImpl implements ReviewService {
         log.info("Getting reviews by filmId and count: {}, {}", filmId, count);
 
         log.info("Checking count: {}", count);
-        if (count == null) {
+        if (count == 0) {
             log.info("Count is null, setting to default value");
             count = 10;
         }
 
         log.info("Checking filmId: {}", filmId);
-        if (filmId == null) {
+        if (filmId == 0) {
             log.info("FilmId is null, returning 10 most rated films");
             return storage.getByFilm(count).stream()
                     .map(ReviewMapper::mapToReviewDto).toList();
@@ -69,8 +69,14 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewDto update(Review review) {
-        log.info("Update review: {}", review);
+    public ReviewDto update(Review newReview) {
+        log.info("Update review: {}", newReview);
+        Review review = storage.getElement(newReview.getReviewId());
+
+        log.info("Preparing new data");
+        review.setContent(newReview.getContent());
+        review.setIsPositive(newReview.getIsPositive());
+
         eventService.createEvent(review.getUserId(), EventType.REVIEW, EventOperation.UPDATE, review.getReviewId());
         return ReviewMapper.mapToReviewDto(storage.updateElement(review));
     }

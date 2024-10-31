@@ -29,6 +29,7 @@ public class DirectorDbStorage extends BaseDbStorage<Director> implements Direct
             "(SELECT director_id FROM FILMS_DIRECTORS fd WHERE film_id = ?)";
     private static final String DELETE_FILM_DIRECTORS = "DELETE FROM films_directors WHERE film_id = ?";
 
+
     public DirectorDbStorage(JdbcTemplate jdbcTemplate, RowMapper<Director> mapper) {
         super(jdbcTemplate, mapper);
         this.jdbcTemplate = jdbcTemplate;
@@ -81,8 +82,12 @@ public class DirectorDbStorage extends BaseDbStorage<Director> implements Direct
     }
 
     @Override
-    public void insertFilmAndDirectors(Integer filmId, Set<Integer> directorIds) {
+    public void deleteFilmsAndDirectors(Integer filmId) {
         delete(DELETE_FILM_DIRECTORS, filmId);
+    }
+
+    @Override
+    public void insertFilmAndDirectors(Integer filmId, Set<Integer> directorIds) {
         jdbcTemplate.batchUpdate(
                 MERGE_QUERY,
 
