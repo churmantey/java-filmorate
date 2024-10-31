@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.review;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,7 +12,6 @@ import java.util.List;
 
 @Repository
 @Qualifier("ReviewDbStorage")
-@Slf4j
 public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStorage {
     private static final String tableName = "reviews";
     private static final String fields = "id, content, is_positive, user_id, film_id, useful";

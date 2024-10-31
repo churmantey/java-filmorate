@@ -21,6 +21,7 @@ public class Review {
 
     @NotNull
     private Integer userId;
+
     @NotNull
     private Integer filmId;
 

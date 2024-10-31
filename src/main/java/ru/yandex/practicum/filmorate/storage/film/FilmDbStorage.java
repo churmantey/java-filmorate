@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,9 +13,10 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Slf4j
+
 @Repository
 @Qualifier("filmDbStorage")
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
@@ -101,19 +101,19 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     private static final String FIND_RECOMMENDED_FOR_USER_QUERY = "SELECT " + fields + " FROM " + tableName + " " +
             """
-            INNER JOIN film_likes fl ON (fl.film_id = id)
-            WHERE fl.user_id IN (
-            SELECT user_id
-            FROM film_likes WHERE film_id IN (
-            	SELECT fl.film_id
-            	FROM film_likes fl WHERE user_id = ?) AND USER_ID <> ?
-            GROUP BY user_id
-            ORDER BY count(FILM_ID) DESC
-            LIMIT 1)
-            AND fl.film_id NOT IN(
-            	SELECT fl.film_id
-            	FROM film_likes fl WHERE user_id = ?)
-            """;
+                    INNER JOIN film_likes fl ON (fl.film_id = id)
+                    WHERE fl.user_id IN (
+                    SELECT user_id
+                    FROM film_likes WHERE film_id IN (
+                    	SELECT fl.film_id
+                    	FROM film_likes fl WHERE user_id = ?) AND USER_ID <> ?
+                    GROUP BY user_id
+                    ORDER BY count(FILM_ID) DESC
+                    LIMIT 1)
+                    AND fl.film_id NOT IN(
+                    	SELECT fl.film_id
+                    	FROM film_likes fl WHERE user_id = ?)
+                    """;
 
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;

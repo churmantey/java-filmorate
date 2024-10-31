@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -29,7 +30,7 @@ public class ReviewController {
 
     @GetMapping
     public List<ReviewDto> getByFilmId(@RequestParam(defaultValue = "0") Integer filmId,
-                                  @RequestParam(defaultValue = "10") Integer count) {
+                                       @Valid @RequestParam(defaultValue = "10") @Positive Integer count) {
         log.info("GET get by film = {} and count = {}", filmId, count);
         List<ReviewDto> revList = reviewService.getByFilmId(filmId, count);
         log.info("Got list of review by film = {} and count = {}", filmId, count);
