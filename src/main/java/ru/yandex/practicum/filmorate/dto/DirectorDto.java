@@ -4,8 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class DirectorDto {
     private Integer id;
@@ -14,7 +16,4 @@ public class DirectorDto {
     @Size(message = "Имя режиссера не может быть длиннее 200 символов", max = 200)
     private String name;
 
-    public DirectorDto(Integer id) {
-        this.id = id;
-    }
 }

@@ -22,7 +22,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({NullObjectException.class, ValidationException.class, IllegalArgumentException.class,
-                       ConstraintViolationException.class})
+            ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNullObjectException(final RuntimeException e) {
         log.error("Got 400 status Bad request {}", e.getMessage(), e);

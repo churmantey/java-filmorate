@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.*;
-import ru.yandex.practicum.filmorate.dto.mapper.DirectorMapper;
+import ru.yandex.practicum.filmorate.dto.mapper.DirectorMapperStruct;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
@@ -29,6 +29,7 @@ public class FilmServiceImpl implements FilmService {
     private final RatingStorage ratingStorage;
     private final GenreStorage genreStorage;
     private final DirectorService directorService;
+    private final DirectorMapperStruct directorMapper;
 
     @Override
     public FilmDto getFilmById(Integer filmId) {
@@ -43,9 +44,9 @@ public class FilmServiceImpl implements FilmService {
         }
 
         Set<Integer> directorsIds = directorService.getDirectorsIdsOfFilm(filmId);
-        List<Director> directors = directorService.getDirectorByIds(directorsIds).stream()
-                .map(DirectorMapper::mapToDirector)
-                .toList();
+        List<Director> directors = directorMapper.dtoListToDirector(
+                directorService.getDirectorByIds(directorsIds)
+        );
         film.getDirectors().addAll(new LinkedHashSet<>(directors));
 
         return FilmMapper.mapToFilmDto(film);

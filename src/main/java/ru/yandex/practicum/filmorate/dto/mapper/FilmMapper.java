@@ -11,6 +11,8 @@ import java.util.Comparator;
 @NoArgsConstructor
 public final class FilmMapper {
 
+    private static final DirectorMapperStruct directorMapper = new DirectorMapperStructImpl();
+
     public static Film mapToFilm(NewFilmRequest request) {
         Film film = new Film(
                 request.getName(),
@@ -26,10 +28,11 @@ public final class FilmMapper {
                     .toList());
         }
         if (request.getDirectors() != null) {
-            film.getDirectors().addAll(request.getDirectors().stream()
-                    .map(DirectorMapper::mapToDirector)
-                    .sorted(Comparator.comparing(Director::getId))
-                    .toList());
+            film.getDirectors().addAll(
+                    directorMapper.dtoSetToDirector(
+                                    request.getDirectors()).stream()
+                            .sorted(Comparator.comparing(Director::getId))
+                            .toList());
         }
         return film;
     }
@@ -59,8 +62,7 @@ public final class FilmMapper {
         }
         if (film.getDirectors() != null) {
             filmDto.getDirectors().addAll(
-                    film.getDirectors().stream()
-                            .map(DirectorMapper::mapToDirectorDto)
+                    directorMapper.directorSetToDto(film.getDirectors()).stream()
                             .sorted(Comparator.comparing(DirectorDto::getId))
                             .toList()
             );
