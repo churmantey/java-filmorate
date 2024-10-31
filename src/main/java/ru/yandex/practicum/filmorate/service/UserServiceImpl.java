@@ -43,6 +43,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(UpdateUserRequest updateUserRequest) {
         User newUser = userMapperStruct.mapUpdateRequestToUserCheck(updateUserRequest);
+
         User user = userStorage.getElement(newUser.getId());
         return userMapperStruct.mapUserToUserDto(userStorage.updateElement(newUser));
     }
