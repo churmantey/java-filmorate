@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.dto.mapper.UserMapper;
@@ -11,6 +12,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserFriendsServiceImpl implements UserFriendsService {
@@ -21,6 +23,7 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     @Override
     public List<UserDto> getCommonFriends(Integer userId, Integer otherUserId) {
         List<User> uLst = userStorage.getMutualFriends(userId, otherUserId);
+        log.info("Общие друзья найдены {}", uLst);
         return uLst.stream()
                 .map(UserMapper::mapToUserDto)
                 .toList();
@@ -29,6 +32,7 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     @Override
     public List<UserDto> getUserFriends(Integer userId) {
         User user = userStorage.getElement(userId);
+        log.info("Поиск общих друзей");
         return userStorage.getUserFriends(userId).stream()
                 .map(UserMapper::mapToUserDto)
                 .toList();
@@ -38,6 +42,7 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     public UserDto addFriend(Integer userId, Integer friendId) {
         User user = userStorage.getElement(userId);
         User friend = userStorage.getElement(friendId);
+        log.info("Создаем событие - добавление в друзья");
         eventService.createEvent(userId, EventType.FRIEND, EventOperation.ADD, friendId);
         return UserMapper.mapToUserDto(
                 userStorage.addUserFriend(userId, friendId)
@@ -48,6 +53,7 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     public UserDto removeFriend(Integer userId, Integer friendId) {
         User user = userStorage.getElement(userId);
         User friend = userStorage.getElement(friendId);
+        log.info("Создаем событие - удаление из друзей");
         eventService.createEvent(userId, EventType.FRIEND, EventOperation.REMOVE, friendId);
         userStorage.removeUserFriend(userId, friendId);
         return UserMapper.mapToUserDto(user);

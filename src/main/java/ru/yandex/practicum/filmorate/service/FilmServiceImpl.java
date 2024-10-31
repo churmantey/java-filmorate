@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.*;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
@@ -18,6 +19,7 @@ import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FilmServiceImpl implements FilmService {
@@ -29,10 +31,12 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public FilmDto getFilmById(Integer filmId) {
+        log.info("Передан id фильма = {}", filmId);
         if (filmId == null) {
             throw new NullObjectException("Передан id фильма null");
         }
         Film film = filmStorage.getElement(filmId);
+        log.info("Поиск фильма с id {}", filmId);
         if (film == null) {
             throw new NotFoundException("Не найден фильм с id = " + filmId);
         }
@@ -46,6 +50,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public FilmDto createFilm(NewFilmRequest newFilmRequest) {
+        log.info("Проверка валидации при создании фильма");
         validateRating(newFilmRequest.getMpa());
         validateGenres(newFilmRequest.getGenres());
         Set<Integer> directorsIds = validateDirectors(newFilmRequest);
@@ -61,6 +66,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public FilmDto updateFilm(UpdateFilmRequest updateFilmRequest) {
+        log.info("Проверка валидации при обновлении фильма");
         validateRating(updateFilmRequest.getMpa());
         validateGenres(updateFilmRequest.getGenres());
         Set<Integer> directorsIds = validateDirectors(updateFilmRequest);
@@ -97,6 +103,7 @@ public class FilmServiceImpl implements FilmService {
     public List<FilmDto> getSortedFilms(Integer directorId, String sort) {
         List<Film> films;
         Director director = directorService.getDirector(directorId);
+        log.info("Поиск режисеров и лайков для сортировки фильмов по режисерам");
         if (sort.equalsIgnoreCase("year")) {
             films = filmStorage.getSortedFilmsByYear(directorId);
         } else if (sort.equalsIgnoreCase("likes")) {
@@ -112,6 +119,7 @@ public class FilmServiceImpl implements FilmService {
     }
 
     private void validateRating(Rating rating) {
+        log.info("Проверка валидации рейтинга");
         if (rating == null
                 || !ratingStorage.isValidRatingId(rating.getId())) {
             throw new ValidationException("Рейтинг фильма не указан или не найден.");
@@ -119,6 +127,7 @@ public class FilmServiceImpl implements FilmService {
     }
 
     private void validateGenres(Collection<Genre> genreList) {
+        log.info("Проверка валидации жанра");
         if (genreList != null) {
             for (Genre genre : genreList) {
                 if (!genreStorage.isValidGenreId(genre.getId())) {
@@ -129,6 +138,7 @@ public class FilmServiceImpl implements FilmService {
     }
 
     private Set<Integer> validateDirectors(NewFilmRequest newFilmRequest) {
+        log.info("Проверка валидации режисера");
         if (newFilmRequest.getDirectors() != null) {
             Set<Integer> directorsIds = newFilmRequest.getDirectors().stream()
                     .map(Director::getId)
