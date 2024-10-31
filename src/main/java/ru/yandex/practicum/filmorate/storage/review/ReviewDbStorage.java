@@ -67,7 +67,7 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
 
     @Override
     public List<Review> getAllElements() {
-        return List.of();
+        return null;
     }
 
     @Override
