@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.service.FilmLikesService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
