@@ -13,14 +13,14 @@ import java.util.List;
 public interface UserMapperStruct {
 
     default User mapNewRequestToUserCheck(NewUserRequest userRequest) {
-        if (userRequest.getName() == null || userRequest.getName().isEmpty()) {
+        if (userRequest.getName() == null || userRequest.getName().isBlank()) {
             userRequest.setName(userRequest.getLogin());
         }
         return mapNewRequestToUser(userRequest);
     }
 
     default User mapUpdateRequestToUserCheck(UpdateUserRequest userRequest) {
-        if (userRequest.getName() == null || userRequest.getName().isEmpty()) {
+        if (userRequest.getName() == null || userRequest.getName().isBlank()) {
             userRequest.setName(userRequest.getLogin());
         }
         return mapUpdateUserRequestToUser(userRequest);
