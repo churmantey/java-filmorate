@@ -66,7 +66,7 @@ public class FilmLikesServiceImpl implements FilmLikesService {
     }
 
     @Override
-    public List<FilmDto> getPopularByYearAndGenre(int count, Integer genreId, Integer year){
+    public List<FilmDto> getPopularByYearAndGenre(int count, Integer genreId, Integer year) {
         List<FilmDto> resList = new ArrayList<>();
         if (genreId == null && year == null) {
             resList = getPopular(count);
