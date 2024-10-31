@@ -31,14 +31,14 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public FilmDto getFilmById(Integer filmId) {
-        log.info("Передан id фильма = {}", filmId);
+        log.info("Passed film id = {}", filmId);
         if (filmId == null) {
-            throw new NullObjectException("Передан id фильма null");
+            throw new NullObjectException("Passed film id is null");
         }
         Film film = filmStorage.getElement(filmId);
-        log.info("Поиск фильма с id {}", filmId);
+        log.info("Searching for film with id = {}", filmId);
         if (film == null) {
-            throw new NotFoundException("Не найден фильм с id = " + filmId);
+            throw new NotFoundException("Film with id = {} not found " + filmId);
         }
 
         Set<Integer> directorsIds = directorService.getDirectorsIdsOfFilm(filmId);
@@ -50,7 +50,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public FilmDto createFilm(NewFilmRequest newFilmRequest) {
-        log.info("Проверка валидации при создании фильма");
+        log.info("Validation check when creating a film with name - {} ", newFilmRequest.getName());
         validateRating(newFilmRequest.getMpa());
         validateGenres(newFilmRequest.getGenres());
         Set<Integer> directorsIds = validateDirectors(newFilmRequest);
@@ -59,14 +59,14 @@ public class FilmServiceImpl implements FilmService {
         Film film = FilmMapper.mapToFilm(newFilmRequest);
         film.validate();
         Film newFilm = filmStorage.addElement(film);
-
         directorService.insertFilmAndDirector(newFilm.getId(), directorsIds);
+        log.info("Added a new record(s) to films_directors with film id = {} and director id(s) = {} ", newFilm.getId(), directorsIds);
         return FilmMapper.mapToFilmDto(newFilm);
     }
 
     @Override
     public FilmDto updateFilm(UpdateFilmRequest updateFilmRequest) {
-        log.info("Проверка валидации при обновлении фильма");
+        log.info("Validation check when updating a film with name - {} ", updateFilmRequest);
         validateRating(updateFilmRequest.getMpa());
         validateGenres(updateFilmRequest.getGenres());
         Set<Integer> directorsIds = validateDirectors(updateFilmRequest);
@@ -74,7 +74,9 @@ public class FilmServiceImpl implements FilmService {
         Film film = FilmMapper.mapToFilm(updateFilmRequest);
         film.validate();
         Film oldFilm = filmStorage.getElement(film.getId());
+        log.info("Deleting all rows from films_directors with film id = {}", film.getId());
         directorService.deleteFilmsAndDirectors(film.getId());
+        log.info("Adding a new record(s) to films_directors with film id = {} and director id(s) = {} ", film.getId(), directorsIds);
         directorService.insertFilmAndDirector(film.getId(), directorsIds);
         return FilmMapper.mapToFilmDto(
                 filmStorage.updateElement(film)
@@ -103,49 +105,48 @@ public class FilmServiceImpl implements FilmService {
     public List<FilmDto> getSortedFilms(Integer directorId, String sort) {
         List<Film> films;
         Director director = directorService.getDirector(directorId);
-        log.info("Поиск режисеров и лайков для сортировки фильмов по режисерам");
+        log.info("Searching for films of director with id = {}, sorted by - {} ", directorId, sort);
         if (sort.equalsIgnoreCase("year")) {
             films = filmStorage.getSortedFilmsByYear(directorId);
         } else if (sort.equalsIgnoreCase("likes")) {
             films = filmStorage.getSortedFilmsByLikes(directorId);
         } else {
-            throw new ValidationException("Введен некорректный фильтр сортировки");
+            throw new ValidationException("Invalid sort filter entered");
         }
 
-        System.out.println(films);
         return films.stream()
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
 
     private void validateRating(Rating rating) {
-        log.info("Проверка валидации рейтинга");
+        log.info("Validation of rating - {}", rating);
         if (rating == null
                 || !ratingStorage.isValidRatingId(rating.getId())) {
-            throw new ValidationException("Рейтинг фильма не указан или не найден.");
+            throw new ValidationException("Film rating is not specified or not found");
         }
     }
 
     private void validateGenres(Collection<Genre> genreList) {
-        log.info("Проверка валидации жанра");
+        log.info("Genre validation check");
         if (genreList != null) {
             for (Genre genre : genreList) {
                 if (!genreStorage.isValidGenreId(genre.getId())) {
-                    throw new ValidationException("Жанр фильма с id = " + genre.getId() + " не указан или не найден.");
+                    throw new ValidationException("Genre of the film with id = " + genre.getId() + " not specified or not found");
                 }
             }
         }
     }
 
     private Set<Integer> validateDirectors(NewFilmRequest newFilmRequest) {
-        log.info("Проверка валидации режисера");
+        log.info("Director validation check");
         if (newFilmRequest.getDirectors() != null) {
             Set<Integer> directorsIds = newFilmRequest.getDirectors().stream()
                     .map(Director::getId)
                     .collect(Collectors.toSet());
             List<Director> directors = directorService.getDirectorByIds(directorsIds);
             if (directorsIds.size() != directors.size()) {
-                throw new ValidationException("Введен некорректный режиссер");
+                throw new ValidationException("Entered invalid director id");
             }
             newFilmRequest.setDirectors(new LinkedHashSet<>(directors));
             return directorsIds;
@@ -163,7 +164,7 @@ public class FilmServiceImpl implements FilmService {
     public List<FilmDto> getFilmsByContext(String query, String criterion) {
         SearchParams searchParams = new SearchParams(query, criterion);
         return filmStorage.findFilmsBySearchParameters(searchParams).stream()
-                .sorted(Comparator.comparing(film-> film.getMpa().getId()))
+                .sorted(Comparator.comparing(film -> film.getMpa().getId()))
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }

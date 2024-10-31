@@ -23,7 +23,7 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     @Override
     public List<UserDto> getCommonFriends(Integer userId, Integer otherUserId) {
         List<User> uLst = userStorage.getMutualFriends(userId, otherUserId);
-        log.info("Общие друзья найдены {}", uLst);
+        log.info("Mutual friends found - {}", uLst);
         return uLst.stream()
                 .map(UserMapper::mapToUserDto)
                 .toList();
@@ -32,7 +32,7 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     @Override
     public List<UserDto> getUserFriends(Integer userId) {
         User user = userStorage.getElement(userId);
-        log.info("Поиск общих друзей");
+        log.info("Searching for friends of user with id = {} ", userId);
         return userStorage.getUserFriends(userId).stream()
                 .map(UserMapper::mapToUserDto)
                 .toList();
@@ -42,7 +42,7 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     public UserDto addFriend(Integer userId, Integer friendId) {
         User user = userStorage.getElement(userId);
         User friend = userStorage.getElement(friendId);
-        log.info("Создаем событие - добавление в друзья");
+        log.info("Creating an event - adding friends {} and {} ", userId, friendId);
         eventService.createEvent(userId, EventType.FRIEND, EventOperation.ADD, friendId);
         return UserMapper.mapToUserDto(
                 userStorage.addUserFriend(userId, friendId)
@@ -53,7 +53,7 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     public UserDto removeFriend(Integer userId, Integer friendId) {
         User user = userStorage.getElement(userId);
         User friend = userStorage.getElement(friendId);
-        log.info("Создаем событие - удаление из друзей");
+        log.info("Creating an event - removing friend {} from {} ", userId, friendId);
         eventService.createEvent(userId, EventType.FRIEND, EventOperation.REMOVE, friendId);
         userStorage.removeUserFriend(userId, friendId);
         return UserMapper.mapToUserDto(user);
