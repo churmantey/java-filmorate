@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
-import ru.yandex.practicum.filmorate.dto.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.dto.mapper.UserMapperStruct;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
@@ -30,12 +29,12 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new NotFoundException("Не найден пользователь с id = " + userId);
         }
-        return UserMapper.mapToUserDto(user);
+        return userMapperStruct.mapUserToUserDto(user);
     }
 
     @Override
     public UserDto createUser(NewUserRequest newUserRequest) {
-        User user = UserMapper.mapToUser(newUserRequest);
+        User user = userMapperStruct.mapNewRequestToUserCheck(newUserRequest);
         return userMapperStruct.mapUserToUserDto(
                 userStorage.addElement(user)
         );
@@ -43,7 +42,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(UpdateUserRequest updateUserRequest) {
-        User newUser = UserMapper.mapToUser(updateUserRequest);
+        User newUser = userMapperStruct.mapUpdateRequestToUserCheck(updateUserRequest);
         User user = userStorage.getElement(newUser.getId());
         return userMapperStruct.mapUserToUserDto(userStorage.updateElement(newUser));
     }
@@ -60,7 +59,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userMapperStruct.map(userStorage.getAllElements());
+        return userMapperStruct.mapUserListToUserDtoList(userStorage.getAllElements());
     }
 
 }

@@ -25,14 +25,14 @@ public class UserFriendsServiceImpl implements UserFriendsService {
     public List<UserDto> getCommonFriends(Integer userId, Integer otherUserId) {
         List<User> uLst = userStorage.getMutualFriends(userId, otherUserId);
         log.info("Mutual friends found - {}", uLst);
-        return userMapperStruct.map(uLst);
+        return userMapperStruct.mapUserListToUserDtoList(uLst);
     }
 
     @Override
     public List<UserDto> getUserFriends(Integer userId) {
         User user = userStorage.getElement(userId);
         log.info("Searching for friends of user with id = {} ", userId);
-        return userMapperStruct.map(userStorage.getUserFriends(userId));
+        return userMapperStruct.mapUserListToUserDtoList(userStorage.getUserFriends(userId));
     }
 
     @Override
