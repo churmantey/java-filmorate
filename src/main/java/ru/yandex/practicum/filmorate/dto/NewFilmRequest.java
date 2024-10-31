@@ -15,14 +15,17 @@ import java.util.Set;
 public class NewFilmRequest {
     @NotBlank
     private String name;
+
     @Size(max = 200)
     private String description;
 
-    private LocalDate releaseDate;
     @Positive
     private Integer duration;
+
     @NotNull
     private Rating mpa;
+
+    private LocalDate releaseDate;
     private Set<Genre> genres;
     private Set<Director> directors;
 }

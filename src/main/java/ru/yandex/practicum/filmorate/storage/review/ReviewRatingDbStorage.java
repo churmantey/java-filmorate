@@ -1,14 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.review;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 
 @Repository
-@Slf4j
 @RequiredArgsConstructor
 public class ReviewRatingDbStorage implements ReviewRatingStorage {
     private final NamedParameterJdbcTemplate jdbc;
@@ -17,9 +15,9 @@ public class ReviewRatingDbStorage implements ReviewRatingStorage {
     public void addRating(Integer id, Integer userId, String type) {
 
         String sql = """
-        INSERT INTO reviews_ratings(review_id, user_id, rating_type)
-        VALUES (:reviewId, :userId, :ratingType);
-""";
+                INSERT INTO reviews_ratings(review_id, user_id, rating_type)
+                VALUES (:reviewId, :userId, :ratingType);
+                """;
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("reviewId", id);
         params.addValue("userId", userId);
