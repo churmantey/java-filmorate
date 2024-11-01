@@ -2,7 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.dto.DirectorDto;
+import ru.yandex.practicum.filmorate.dto.mapper.DirectorMapper;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 
 import java.util.List;
@@ -13,27 +14,30 @@ import java.util.Set;
 public class DirectorServiceImpl implements DirectorService {
 
     private final DirectorStorage directorStorage;
+    private final DirectorMapper directorMapper;
 
     @Override
-    public List<Director> getAllDirectors() {
-        return directorStorage.getAllElements();
+    public List<DirectorDto> getAllDirectors() {
+        return directorMapper.directorListToDto(directorStorage.getAllElements());
     }
 
     @Override
-    public Director createDirector(Director director) {
-        return directorStorage.addElement(director);
+    public DirectorDto createDirector(DirectorDto directorDto) {
+        return directorMapper.directorToDto(
+                directorStorage.addElement(directorMapper.dtoToDirector(directorDto))
+        );
     }
 
     @Override
-    public Director getDirector(Integer id) {
-        return directorStorage.getElement(id);
+    public DirectorDto getDirector(Integer id) {
+        return directorMapper.directorToDto(directorStorage.getElement(id));
     }
 
     @Override
-    public Director updateDirector(Director director) {
-        Director savedDirector = getDirector(director.getId());
-        directorStorage.updateElement(director);
-        return director;
+    public DirectorDto updateDirector(DirectorDto directorDto) {
+        DirectorDto savedDirector = getDirector(directorDto.getId());
+        directorStorage.updateElement(directorMapper.dtoToDirector(directorDto));
+        return directorDto;
     }
 
     @Override
@@ -42,8 +46,10 @@ public class DirectorServiceImpl implements DirectorService {
     }
 
     @Override
-    public List<Director> getDirectorByIds(Set<Integer> directorIds) {
-        return directorStorage.getDirectorByIds(directorIds);
+    public List<DirectorDto> getDirectorByIds(Set<Integer> directorIds) {
+        return directorMapper.directorListToDto(
+                directorStorage.getDirectorByIds(directorIds)
+        );
     }
 
     @Override
@@ -62,8 +68,10 @@ public class DirectorServiceImpl implements DirectorService {
     }
 
     @Override
-    public List<Director> getAllDirectorForOneFilm(Integer id) {
-        return directorStorage.getDirectorsByFilmId(id);
+    public List<DirectorDto> getAllDirectorForOneFilm(Integer id) {
+        return directorMapper.directorListToDto(
+                directorStorage.getDirectorsByFilmId(id)
+        );
     }
 
 }

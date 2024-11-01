@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.*;
+import ru.yandex.practicum.filmorate.dto.mapper.DirectorMapper;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
@@ -28,6 +29,7 @@ public class FilmServiceImpl implements FilmService {
     private final RatingStorage ratingStorage;
     private final GenreStorage genreStorage;
     private final DirectorService directorService;
+    private final DirectorMapper directorMapper;
 
     @Override
     public FilmDto getFilmById(Integer filmId) {
@@ -42,7 +44,9 @@ public class FilmServiceImpl implements FilmService {
         }
 
         Set<Integer> directorsIds = directorService.getDirectorsIdsOfFilm(filmId);
-        List<Director> directors = directorService.getDirectorByIds(directorsIds);
+        List<Director> directors = directorMapper.dtoListToDirector(
+                directorService.getDirectorByIds(directorsIds)
+        );
         film.getDirectors().addAll(new LinkedHashSet<>(directors));
 
         return FilmMapper.mapToFilmDto(film);
@@ -52,9 +56,12 @@ public class FilmServiceImpl implements FilmService {
     public FilmDto createFilm(NewFilmRequest newFilmRequest) {
         log.info("Validation check when creating a film with name - {} ", newFilmRequest.getName());
         validateRating(newFilmRequest.getMpa());
-        validateGenres(newFilmRequest.getGenres());
+        if (newFilmRequest.getGenres() != null) {
+            validateGenres(newFilmRequest.getGenres().stream()
+                    .map(idEntity -> new Genre(idEntity.getId(), idEntity.getName()))
+                    .toList());
+        }
         Set<Integer> directorsIds = validateDirectors(newFilmRequest);
-
 
         Film film = FilmMapper.mapToFilm(newFilmRequest);
         film.validate();
@@ -68,7 +75,12 @@ public class FilmServiceImpl implements FilmService {
     public FilmDto updateFilm(UpdateFilmRequest updateFilmRequest) {
         log.info("Validation check when updating a film with name - {} ", updateFilmRequest);
         validateRating(updateFilmRequest.getMpa());
-        validateGenres(updateFilmRequest.getGenres());
+
+        if (updateFilmRequest.getGenres() != null) {
+            validateGenres(updateFilmRequest.getGenres().stream()
+                    .map(idEntity -> new Genre(idEntity.getId(), idEntity.getName()))
+                    .toList());
+        }
         Set<Integer> directorsIds = validateDirectors(updateFilmRequest);
 
         Film film = FilmMapper.mapToFilm(updateFilmRequest);
@@ -93,7 +105,6 @@ public class FilmServiceImpl implements FilmService {
         return filmStorage.deleteElementById(id);
     }
 
-
     @Override
     public List<FilmDto> getAllFilms() {
         return filmStorage.getAllElements().stream()
@@ -104,7 +115,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<FilmDto> getFilmsByDirectorSorted(Integer directorId, String sort) {
         List<Film> films;
-        Director director = directorService.getDirector(directorId);
+        DirectorDto directorDto = directorService.getDirector(directorId);
         log.info("Searching for films of director with id = {}, sorted by - {} ", directorId, sort);
         if (sort.equalsIgnoreCase("year")) {
             films = filmStorage.getSortedFilmsByYear(directorId);
@@ -142,13 +153,13 @@ public class FilmServiceImpl implements FilmService {
         log.info("Director validation check");
         if (newFilmRequest.getDirectors() != null) {
             Set<Integer> directorsIds = newFilmRequest.getDirectors().stream()
-                    .map(Director::getId)
+                    .map(DirectorDto::getId)
                     .collect(Collectors.toSet());
-            List<Director> directors = directorService.getDirectorByIds(directorsIds);
-            if (directorsIds.size() != directors.size()) {
+            List<DirectorDto> directorsDto = directorService.getDirectorByIds(directorsIds);
+            if (directorsIds.size() != directorsDto.size()) {
                 throw new ValidationException("Entered invalid director id");
             }
-            newFilmRequest.setDirectors(new LinkedHashSet<>(directors));
+            newFilmRequest.setDirectors(new LinkedHashSet<>(directorsDto));
             return directorsIds;
         }
         return new LinkedHashSet<>();

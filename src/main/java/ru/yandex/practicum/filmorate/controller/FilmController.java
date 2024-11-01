@@ -36,7 +36,7 @@ public class FilmController {
         log.info("GET film {}", filmId);
         FilmDto filmDto = filmService.getFilmById(filmId);
         log.info("GET film RESPONSE {}", filmDto);
-        return  filmDto;
+        return filmDto;
     }
 
     @GetMapping("/director/{directorId}")
@@ -83,7 +83,7 @@ public class FilmController {
 
     @GetMapping("/search")
     public List<FilmDto> getFilmsByContext(@Valid @RequestParam(name = "query") @NotEmpty String query,
-                                         @Valid @RequestParam(name = "by") @SearchParametersConstraint String find) {
+                                           @Valid @RequestParam(name = "by") @SearchParametersConstraint String find) {
         log.info("Search films by context {} params {}", query, find);
         List<FilmDto> foundFilms = filmService.getFilmsByContext(query, find);
         log.info("{} films was found", foundFilms.size());
