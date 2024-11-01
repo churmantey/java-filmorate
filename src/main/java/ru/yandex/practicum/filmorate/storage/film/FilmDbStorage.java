@@ -4,13 +4,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dto.SearchParams;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 
+import java.util.ArrayList;
 import java.util.List;
+
 
 @Repository
 @Qualifier("filmDbStorage")
@@ -35,16 +39,94 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String REMOVE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
     private static final String FIND_LIKES_QUERY = "SELECT user_id FROM film_likes WHERE film_id = ? ORDER BY user_id";
     private static final String DELETE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ?";
+    private static final String GET_SORTED_FILMS_BY_YEAR = "SELECT * FROM FILMS f " +
+            "WHERE id IN (SELECT film_id FROM FILMS_DIRECTORS fd WHERE director_id = ?) " +
+            "ORDER BY EXTRACT (YEAR FROM release_date);";
+    private static final String GET_SORTED_FILMS_BY_LIKES = "SELECT f.*, COUNT(fl.film_id) AS likes_count " +
+            "FROM films f " +
+            "JOIN FILMS_DIRECTORS fd ON f.id=fd.film_id AND fd.DIRECTOR_ID = ? " +
+            "LEFT JOIN film_likes fl ON f.id=fl.film_id " +
+            "GROUP BY f.id " +
+            "ORDER BY likes_count DESC";
+
+    private static final String FIND_FILMS_BY_USER_LIKES_QUERY = "SELECT fl.film_id FROM film_likes AS fl " +
+            "JOIN (SELECT film_id, COUNT(user_id) AS cou FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
+            "WHERE fl.user_id = ? ORDER BY gro.cou DESC";
+    private static final String FIND_TOP_RATED_QUERY_BY_GENRE_AND_YEAR = "SELECT  " + fields + ", COUNT(fl.user_id) AS countUsers " +
+            "FROM films AS f " +
+            "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
+            "WHERE f.id IN (SELECT fg.film_id FROM film_genres AS fg WHERE fg.genre_id = ?) AND EXTRACT(YEAR FROM f.release_date) = ? " +
+            "GROUP BY " + fields +
+            " ORDER BY countUsers DESC " +
+            "LIMIT ?";
+    private static final String FIND_TOP_RATED_QUERY_BY_GENRE = "SELECT " + fields + ", COUNT(fl.user_id) AS countUsers " +
+            "FROM films AS f " +
+            "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
+            "WHERE f.id IN (SELECT fg.film_id FROM film_genres AS fg WHERE fg.genre_id = ?) " +
+            "GROUP BY " + fields +
+            " ORDER BY countUsers DESC " +
+            "LIMIT ?";
+    private static final String FIND_TOP_RATED_QUERY_BY_YEAR = "SELECT " + fields + ", COUNT(fl.user_id) AS countUsers " +
+            "FROM films AS f " +
+            "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
+            "WHERE EXTRACT(YEAR FROM f.release_date) = ? " +
+            "GROUP BY " + fields +
+            " ORDER BY countUsers DESC " +
+            "LIMIT ?";
+
+    private static final String FIND_ALL_BY_TITLE_CONTEXT = "SELECT f.*, COUNT(fl.user_id) AS likes_count " +
+            "FROM film_likes fl " +
+            "RIGHT JOIN films f ON fl.film_id = f.id " +
+            "WHERE LOWER(f.title) LIKE ? " +
+            "GROUP BY f.id " +
+            "ORDER BY likes_count DESC";
+    private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT f.*, COUNT(fl.user_id) AS likes_count " +
+            "FROM film_likes fl " +
+            "RIGHT JOIN films f ON fl.film_id = f.id " +
+            "WHERE f.id IN " +
+            "(SELECT fd.film_id FROM films_directors AS fd " +
+            "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
+            "GROUP BY f.id " +
+            "ORDER BY likes_count DESC";
+    private static final String FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT =
+            "SELECT f.*, COUNT(fl.user_id) AS likes_count " +
+                    "FROM film_likes fl " +
+                    "RIGHT JOIN films f ON fl.film_id = f.id " +
+                    "WHERE (LOWER(f.title) LIKE ?) OR " +
+                    "f.id IN (SELECT fd.film_id FROM films_directors AS fd " +
+                    "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
+                    "GROUP BY f.id " +
+                    "ORDER BY likes_count DESC";
+
+    private static final String FIND_RECOMMENDED_FOR_USER_QUERY = "SELECT " + fields + " FROM " + tableName + " " +
+            """
+                    INNER JOIN film_likes fl ON (fl.film_id = id)
+                    WHERE fl.user_id IN (
+                    SELECT user_id
+                    FROM film_likes WHERE film_id IN (
+                    	SELECT fl.film_id
+                    	FROM film_likes fl WHERE user_id = ?) AND USER_ID <> ?
+                    GROUP BY user_id
+                    ORDER BY count(FILM_ID) DESC
+                    LIMIT 1)
+                    AND fl.film_id NOT IN(
+                    	SELECT fl.film_id
+                    	FROM film_likes fl WHERE user_id = ?)
+                    """;
+
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
+    private final DirectorStorage directorStorage;
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate,
                          RowMapper<Film> mapper,
                          GenreStorage genreStorage,
-                         RatingStorage ratingStorage) {
+                         RatingStorage ratingStorage,
+                         DirectorStorage directorStorage) {
         super(jdbcTemplate, mapper);
         this.genreStorage = genreStorage;
         this.ratingStorage = ratingStorage;
+        this.directorStorage = directorStorage;
     }
 
     @Override
@@ -95,7 +177,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public List<Film> getTopRatedFilms(int count) {
-        return findMany(FIND_TOP_RATED_QUERY, count);
+        List<Film> films = findMany(FIND_TOP_RATED_QUERY, count);
+        films.forEach(this::setFilmMpaGenresDirectors);
+        return films;
     }
 
     @Override
@@ -115,7 +199,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public List<Film> getAllElements() {
         List<Film> baseList = findMany(FIND_ALL_QUERY);
-        baseList.forEach(this::setFilmMpaAndGenres);
+        baseList.forEach(this::setFilmMpaGenresDirectors);
         return baseList;
     }
 
@@ -123,14 +207,29 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     public Film getElement(Integer id) {
         Film film = findOne(FIND_BY_ID_QUERY, id)
                 .orElseThrow(() -> new NotFoundException("Не найден фильм с id = " + id));
-        setFilmMpaAndGenres(film);
+        setFilmMpaGenresDirectors(film);
         return film;
     }
 
-    // заполняет коллекции жанров в фильме по данным из БД
-    private void setFilmMpaAndGenres(Film film) {
+    @Override
+    public List<Film> getSortedFilmsByYear(Integer id) {
+        List<Film> films = findMany(GET_SORTED_FILMS_BY_YEAR, id);
+        films.forEach(this::setFilmMpaGenresDirectors);
+        return films;
+    }
+
+    @Override
+    public List<Film> getSortedFilmsByLikes(Integer id) {
+        List<Film> films = findMany(GET_SORTED_FILMS_BY_LIKES, id);
+        films.forEach(this::setFilmMpaGenresDirectors);
+        return films;
+    }
+
+    // заполняет в фильме рейтинг, коллекции жанров, режиссеров и лайков по данным из БД
+    private void setFilmMpaGenresDirectors(Film film) {
         film.setMpa(ratingStorage.getElement(film.getMpa().getId()));
         film.getGenres().addAll(genreStorage.getFilmGenresById(film.getId()));
+        film.getDirectors().addAll(directorStorage.getDirectorsByFilmId(film.getId()));
     }
 
     //добавляет жанры фильма в БД
@@ -144,4 +243,54 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         delete(DELETE_LIKES_QUERY, filmId);
     }
 
+    @Override
+    public List<Film> getFilmsLikesByUsers(Integer userId, Integer friendId) {
+        List<Integer> filmsIds = retrieveIdList(FIND_FILMS_BY_USER_LIKES_QUERY, userId);
+        filmsIds.retainAll(retrieveIdList(FIND_FILMS_BY_USER_LIKES_QUERY, friendId)); //оставляем в filmsIds общие id фильмов
+        return filmsIds.stream().map(this::getElement).toList();
+    }
+
+    public List<Film> findFilmsBySearchParameters(SearchParams searchParams) {
+        List<Film> baseList = new ArrayList<>();
+        if (searchParams.isNeedTitle() && !searchParams.isNeedDirector()) {
+            baseList = findMany(FIND_ALL_BY_TITLE_CONTEXT, searchParams.getQuery());
+        }
+        if (searchParams.isNeedDirector() && !searchParams.isNeedTitle()) {
+            baseList = findMany(FIND_ALL_BY_DIRECTOR_CONTEXT, searchParams.getQuery());
+        }
+        if (searchParams.isNeedDirector() && searchParams.isNeedTitle()) {
+            baseList = findMany(FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT,
+                    searchParams.getQuery(), searchParams.getQuery());
+        }
+        baseList.forEach(this::setFilmMpaGenresDirectors);
+        return baseList;
+    }
+
+    @Override
+    public List<Film> getPopularFilmsByGenreAndYear(Integer genreId, Integer year, Integer count) {
+        List<Film> films = findMany(FIND_TOP_RATED_QUERY_BY_GENRE_AND_YEAR, genreId, year, count);
+        films.forEach(this::setFilmMpaGenresDirectors);
+        return films;
+    }
+
+    @Override
+    public List<Film> getPopularFilmsByGenre(Integer genreId, Integer count) {
+        List<Film> films = findMany(FIND_TOP_RATED_QUERY_BY_GENRE, genreId, count);
+        films.forEach(this::setFilmMpaGenresDirectors);
+        return films;
+    }
+
+    @Override
+    public List<Film> getPopularFilmsByYear(Integer year, Integer count) {
+        List<Film> films = findMany(FIND_TOP_RATED_QUERY_BY_YEAR, year, count);
+        films.forEach(this::setFilmMpaGenresDirectors);
+        return films;
+    }
+
+    @Override
+    public List<Film> getRecommendedFilms(Integer userId) {
+        List<Film> films = findMany(FIND_RECOMMENDED_FOR_USER_QUERY, userId, userId, userId);
+        films.forEach(this::setFilmMpaGenresDirectors);
+        return films;
+    }
 }

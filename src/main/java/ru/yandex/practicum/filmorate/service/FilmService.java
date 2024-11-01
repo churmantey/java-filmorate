@@ -20,4 +20,11 @@ public interface FilmService {
     boolean deleteFilmById(Integer id);
 
     List<FilmDto> getAllFilms();
+
+    List<FilmDto> getFilmsByDirectorSorted(Integer directorId, String sort);
+
+    List<FilmDto> getCommonFilmsLikesByUsers(Integer userId, Integer friendId);
+
+    List<FilmDto> getFilmsByContext(String query, String criterion);
+
 }

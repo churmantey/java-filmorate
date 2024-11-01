@@ -17,6 +17,10 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     private static final String fields = "id, login, name, email, birthday";
     private static final String FIND_ALL_QUERY = "SELECT " + fields + " from " + tableName;
     private static final String FIND_BY_ID_QUERY = FIND_ALL_QUERY + " WHERE id = ?";
+    private static final String FIND_USER_LIKES_BY_FILM_ID_QUERY = FIND_ALL_QUERY + """
+            WHERE id IN (SELECT user_id FROM film_likes WHERE film_id = ?)
+            ORDER BY id
+            """;
     private static final String FIND_FRIENDS_QUERY = FIND_ALL_QUERY + " WHERE id IN " +
             "(SELECT uf.friend_id FROM user_friends uf WHERE uf.user_id = ?)";
     private static final String FIND_MUTUAL_FRIENDS_QUERY = FIND_ALL_QUERY +
@@ -112,5 +116,10 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     @Override
     public List<User> getUserFriends(Integer userId) {
         return findMany(FIND_FRIENDS_QUERY, userId);
+    }
+
+    @Override
+    public List<User> getUserLikesByFilmId(Integer filmId) {
+        return findMany(FIND_USER_LIKES_BY_FILM_ID_QUERY, filmId);
     }
 }

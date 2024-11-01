@@ -16,19 +16,14 @@ public class FilmLikesController {
 
     private final FilmLikesService filmLikesService;
 
-    //GET /films/popular?count={count}
-    @GetMapping("/popular")
-    public List<FilmDto> getPopular(@RequestParam(defaultValue = "10") int count) {
-        log.info("GET popular {}", count);
-        return filmLikesService.getPopular(count);
-    }
-
     //PUT /films/{id}/like/{userId}
     @PutMapping("/{id}/like/{userId}")
     public FilmDto addLike(@PathVariable Integer id,
                            @PathVariable Integer userId) {
         log.info("PUT add like film {} , user {}", id, userId);
-        return filmLikesService.addLike(id, userId);
+        FilmDto filmDto = filmLikesService.addLike(id, userId);
+        log.info("К film {} добавлен лайк user {}", id, userId);
+        return filmDto;
     }
 
     //DELETE /films/{id}/like/{userId}
@@ -36,7 +31,19 @@ public class FilmLikesController {
     public FilmDto removeLike(@PathVariable Integer id,
                               @PathVariable Integer userId) {
         log.info("DELETE like film {} , user {}", id, userId);
-        return filmLikesService.removeLike(id, userId);
+        FilmDto filmDto = filmLikesService.removeLike(id, userId);
+        log.info("Удален лайк film {} от user {}", id, userId);
+        return filmDto;
     }
 
+    //GET /films/popular?count={limit}&genreId={genreId}&year={year}
+    @GetMapping("/popular")
+    public List<FilmDto> getPopularByYearAndGenre(@RequestParam(defaultValue = "10") int count,
+                                                  @RequestParam(required = false) Integer genreId,
+                                                  @RequestParam(required = false) Integer year) {
+        log.info("GET first {} popular films by genre {} and year {}", count, genreId, year);
+        List<FilmDto> resList = filmLikesService.getPopularByYearAndGenre(count, genreId, year);
+        log.info("Получены first {} popular films by genre {} and year {}", count, genreId, year);
+        return resList;
+    }
 }

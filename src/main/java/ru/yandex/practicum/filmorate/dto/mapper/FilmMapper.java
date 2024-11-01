@@ -1,14 +1,17 @@
 package ru.yandex.practicum.filmorate.dto.mapper;
 
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
-import ru.yandex.practicum.filmorate.dto.IdEntity;
-import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.*;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+
+import java.util.Comparator;
 
 @NoArgsConstructor
 public final class FilmMapper {
+
+    private static final DirectorMapper directorMapper = new DirectorMapperImpl();
 
     public static Film mapToFilm(NewFilmRequest request) {
         Film film = new Film(
@@ -19,7 +22,17 @@ public final class FilmMapper {
                 request.getMpa().getId()
         );
         if (request.getGenres() != null) {
-            film.getGenres().addAll(request.getGenres());
+            film.getGenres().addAll(request.getGenres().stream()
+                    .map(idEntity -> new Genre(idEntity.getId(), idEntity.getName()))
+                    .sorted(Comparator.comparing(Genre::getId))
+                    .toList());
+        }
+        if (request.getDirectors() != null) {
+            film.getDirectors().addAll(
+                    directorMapper.dtoSetToDirector(
+                                    request.getDirectors()).stream()
+                            .sorted(Comparator.comparing(Director::getId))
+                            .toList());
         }
         return film;
     }
@@ -37,13 +50,6 @@ public final class FilmMapper {
         filmDto.setDescription(film.getDescription());
         filmDto.setReleaseDate(film.getReleaseDate());
         filmDto.setDuration(film.getDuration());
-//        if (film.getLikes() != null) {
-//            filmDto.getLikes().addAll(
-//                    film.getLikes().stream()
-//                            .map(user -> new IdEntity(user.getId(), user.getName()))
-//                            .toList()
-//            );
-//        }
         if (film.getMpa() != null) {
             filmDto.setMpa(new IdEntity(film.getMpa().getId(), film.getMpa().getName()));
         }
@@ -51,7 +57,15 @@ public final class FilmMapper {
             filmDto.getGenres().addAll(
                     film.getGenres().stream()
                             .map(genre -> new IdEntity(genre.getId(), genre.getName()))
+                            .sorted(Comparator.comparing(IdEntity::getId))
                             .toList());
+        }
+        if (film.getDirectors() != null) {
+            filmDto.getDirectors().addAll(
+                    directorMapper.directorSetToDto(film.getDirectors()).stream()
+                            .sorted(Comparator.comparing(DirectorDto::getId))
+                            .toList()
+            );
         }
         return filmDto;
     }

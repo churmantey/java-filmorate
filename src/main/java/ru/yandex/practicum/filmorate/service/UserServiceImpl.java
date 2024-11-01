@@ -18,6 +18,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
+    private final UserMapper userMapper;
 
     @Override
     public UserDto getUserById(Integer userId) {
@@ -28,22 +29,23 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new NotFoundException("Не найден пользователь с id = " + userId);
         }
-        return UserMapper.mapToUserDto(user);
+        return userMapper.mapUserToUserDto(user);
     }
 
     @Override
     public UserDto createUser(NewUserRequest newUserRequest) {
-        User user = UserMapper.mapToUser(newUserRequest);
-        return UserMapper.mapToUserDto(
+        User user = userMapper.mapNewRequestToUserCheck(newUserRequest);
+        return userMapper.mapUserToUserDto(
                 userStorage.addElement(user)
         );
     }
 
     @Override
     public UserDto updateUser(UpdateUserRequest updateUserRequest) {
-        User newUser = UserMapper.mapToUser(updateUserRequest);
+        User newUser = userMapper.mapUpdateRequestToUserCheck(updateUserRequest);
+
         User user = userStorage.getElement(newUser.getId());
-        return UserMapper.mapToUserDto(userStorage.updateElement(newUser));
+        return userMapper.mapUserToUserDto(userStorage.updateElement(newUser));
     }
 
     @Override
@@ -58,9 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userStorage.getAllElements().stream()
-                .map(UserMapper::mapToUserDto)
-                .toList();
+        return userMapper.mapUserListToUserDtoList(userStorage.getAllElements());
     }
 
 }

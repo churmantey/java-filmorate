@@ -4,7 +4,6 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -38,7 +37,12 @@ public class Film {
     private Rating mpa;
 
     @Getter
+    private final Set<User> likes;
+
+    @Getter
     private final Set<Genre> genres;
+
+    private final Set<Director> directors;
 
     public Film(String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
         this.name = name;
@@ -46,7 +50,9 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = new Rating(mpaId);
+        this.likes = new LinkedHashSet<>();
         this.genres = new LinkedHashSet<>();
+        this.directors = new LinkedHashSet<>();
     }
 
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
@@ -56,7 +62,9 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = new Rating(mpaId);
+        this.likes = new LinkedHashSet<>();
         this.genres = new LinkedHashSet<>();
+        this.directors = new LinkedHashSet<>();
     }
 
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration) {
@@ -66,15 +74,9 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = null;
+        this.likes = new LinkedHashSet<>();
         this.genres = new LinkedHashSet<>();
-    }
-
-    public void validate() {
-        if (this.getReleaseDate() == null || this.getReleaseDate().isBefore(CINEMA_EPOCH)) {
-            String message = "Некорректная дата выхода фильма";
-            log.debug(message);
-            throw new ValidationException(message);
-        }
+        this.directors = new LinkedHashSet<>();
     }
 
 }
