@@ -64,7 +64,6 @@ public class FilmServiceImpl implements FilmService {
         Set<Integer> directorsIds = validateDirectors(newFilmRequest);
 
         Film film = FilmMapper.mapToFilm(newFilmRequest);
-        film.validate();
         Film newFilm = filmStorage.addElement(film);
         directorService.insertFilmAndDirector(newFilm.getId(), directorsIds);
         log.info("Added a new record(s) to films_directors with film id = {} and director id(s) = {} ", newFilm.getId(), directorsIds);
@@ -84,7 +83,6 @@ public class FilmServiceImpl implements FilmService {
         Set<Integer> directorsIds = validateDirectors(updateFilmRequest);
 
         Film film = FilmMapper.mapToFilm(updateFilmRequest);
-        film.validate();
         Film oldFilm = filmStorage.getElement(film.getId());
         log.info("Deleting all rows from films_directors with film id = {}", film.getId());
         directorService.deleteFilmsAndDirectors(film.getId());

@@ -5,7 +5,6 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -64,18 +63,6 @@ public class FilmTests {
         violations = validator.validate(film);
         assertEquals(0, violations.size(),
                 "Неожиданное количество нарушений при валидации корректного описания");
-    }
-
-    @Test
-    public void whenReleaseDateBeforeCinemaEpochThenNotValid() {
-        film.setReleaseDate(LocalDate.of(1895, 12, 27));
-        assertThrows(ValidationException.class, film::validate);
-    }
-
-    @Test
-    public void whenReleaseDateAfterCinemaEpochThenValid() {
-        film.setReleaseDate(LocalDate.of(1895, 12, 28));
-        assertDoesNotThrow(film::validate);
     }
 
     @Test
