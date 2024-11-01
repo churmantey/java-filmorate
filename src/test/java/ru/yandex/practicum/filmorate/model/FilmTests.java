@@ -67,18 +67,6 @@ public class FilmTests {
     }
 
     @Test
-    public void whenReleaseDateBeforeCinemaEpochThenNotValid() {
-        film.setReleaseDate(LocalDate.of(1895, 12, 27));
-        assertThrows(ValidationException.class, film::validate);
-    }
-
-    @Test
-    public void whenReleaseDateAfterCinemaEpochThenValid() {
-        film.setReleaseDate(LocalDate.of(1895, 12, 28));
-        assertDoesNotThrow(film::validate);
-    }
-
-    @Test
     public void whenDurationZeroThenNotValid() {
         film.setDuration(0);
         violations = validator.validate(film);

@@ -4,7 +4,6 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -78,14 +77,6 @@ public class Film {
         this.likes = new LinkedHashSet<>();
         this.genres = new LinkedHashSet<>();
         this.directors = new LinkedHashSet<>();
-    }
-
-    public void validate() {
-        if (this.getReleaseDate() == null || this.getReleaseDate().isBefore(CINEMA_EPOCH)) {
-            String message = "Некорректная дата выхода фильма";
-            log.debug(message);
-            throw new ValidationException(message);
-        }
     }
 
 }
