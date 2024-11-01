@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.DirectorDto;
-import ru.yandex.practicum.filmorate.dto.mapper.DirectorMapperStruct;
+import ru.yandex.practicum.filmorate.dto.mapper.DirectorMapper;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.Set;
 public class DirectorServiceImpl implements DirectorService {
 
     private final DirectorStorage directorStorage;
-    private final DirectorMapperStruct directorMapper;
+    private final DirectorMapper directorMapper;
 
     @Override
     public List<DirectorDto> getAllDirectors() {

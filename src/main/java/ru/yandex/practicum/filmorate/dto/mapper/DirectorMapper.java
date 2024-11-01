@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 @Mapper(componentModel = "spring")
-public interface DirectorMapperStruct {
+public interface DirectorMapper {
 
     Director dtoToDirector(DirectorDto directorDto);
 

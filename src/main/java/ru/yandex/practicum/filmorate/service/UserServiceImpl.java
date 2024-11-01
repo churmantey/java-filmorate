@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
-import ru.yandex.practicum.filmorate.dto.mapper.UserMapperStruct;
+import ru.yandex.practicum.filmorate.dto.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -18,7 +18,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
-    private final UserMapperStruct userMapperStruct;
+    private final UserMapper userMapper;
 
     @Override
     public UserDto getUserById(Integer userId) {
@@ -29,23 +29,23 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new NotFoundException("Не найден пользователь с id = " + userId);
         }
-        return userMapperStruct.mapUserToUserDto(user);
+        return userMapper.mapUserToUserDto(user);
     }
 
     @Override
     public UserDto createUser(NewUserRequest newUserRequest) {
-        User user = userMapperStruct.mapNewRequestToUserCheck(newUserRequest);
-        return userMapperStruct.mapUserToUserDto(
+        User user = userMapper.mapNewRequestToUserCheck(newUserRequest);
+        return userMapper.mapUserToUserDto(
                 userStorage.addElement(user)
         );
     }
 
     @Override
     public UserDto updateUser(UpdateUserRequest updateUserRequest) {
-        User newUser = userMapperStruct.mapUpdateRequestToUserCheck(updateUserRequest);
+        User newUser = userMapper.mapUpdateRequestToUserCheck(updateUserRequest);
 
         User user = userStorage.getElement(newUser.getId());
-        return userMapperStruct.mapUserToUserDto(userStorage.updateElement(newUser));
+        return userMapper.mapUserToUserDto(userStorage.updateElement(newUser));
     }
 
     @Override
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userMapperStruct.mapUserListToUserDtoList(userStorage.getAllElements());
+        return userMapper.mapUserListToUserDtoList(userStorage.getAllElements());
     }
 
 }

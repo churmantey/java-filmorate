@@ -11,7 +11,7 @@ import java.util.Comparator;
 @NoArgsConstructor
 public final class FilmMapper {
 
-    private static final DirectorMapperStruct directorMapper = new DirectorMapperStructImpl();
+    private static final DirectorMapper directorMapper = new DirectorMapperImpl();
 
     public static Film mapToFilm(NewFilmRequest request) {
         Film film = new Film(

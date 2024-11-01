@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public interface UserMapperStruct {
+public interface UserMapper {
 
     default User mapNewRequestToUserCheck(NewUserRequest userRequest) {
         if (userRequest.getName() == null || userRequest.getName().isBlank()) {
