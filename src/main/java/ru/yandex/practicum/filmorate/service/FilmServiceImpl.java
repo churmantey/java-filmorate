@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.*;
 import ru.yandex.practicum.filmorate.dto.mapper.DirectorMapper;
-import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmNewMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;

@@ -10,12 +10,8 @@ import ru.yandex.practicum.filmorate.model.Rating;
 public interface FilmNewMapper {
 
     @Mapping(target = "id", ignore = true)
-    //@Mapping(target = "genres", source = "genres")
-    //@Mapping(target = "directors", source = "directors")
     Film mapRequestToFilm(NewFilmRequest newFilmRequest);
 
-    //@Mapping(target = "genres", source = "genres")
-    //@Mapping(target = "directors", source = "directors")
     Film mapRequestToFilm(UpdateFilmRequest updateFilmRequest);
 
     FilmDto mapFilmToDto(Film film);

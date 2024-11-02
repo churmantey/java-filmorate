@@ -4,8 +4,9 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Data
 @RequiredArgsConstructor
@@ -21,8 +22,8 @@ public class FilmDto {
     private final Set<DirectorDto> directors;
 
     public FilmDto() {
-        this.genres = new LinkedHashSet<>();
-        this.directors = new LinkedHashSet<>();
+        this.genres = new TreeSet<>(Comparator.comparing(IdEntity::getId));
+        this.directors = new TreeSet<>(Comparator.comparing(DirectorDto::getId));
     }
 
 }

@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -13,11 +12,8 @@ import java.util.Set;
  * Film.
  */
 
-@Slf4j
 @Data
 public class Film {
-
-    private static final LocalDate CINEMA_EPOCH = LocalDate.of(1895, 12, 28);
 
     private Integer id;
 
