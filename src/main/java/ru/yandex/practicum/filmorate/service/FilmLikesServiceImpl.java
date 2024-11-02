@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
+import ru.yandex.practicum.filmorate.dto.mapper.FilmNewMapper;
 import ru.yandex.practicum.filmorate.model.EventOperation;
 import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -23,6 +24,7 @@ public class FilmLikesServiceImpl implements FilmLikesService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final EventService eventService;
+    private final FilmNewMapper filmMapper;
 
     @Override
     public FilmDto addLike(Integer filmId, Integer userId) {
@@ -31,7 +33,7 @@ public class FilmLikesServiceImpl implements FilmLikesService {
         log.info("Creating an event - adding like");
         eventService.createEvent(userId, EventType.LIKE, EventOperation.ADD, filmId);
         filmStorage.addLike(filmId, userId);
-        return FilmMapper.mapToFilmDto(filmStorage.getElement(filmId));
+        return filmMapper.mapFilmToDto(filmStorage.getElement(filmId));
     }
 
     @Override
@@ -41,32 +43,33 @@ public class FilmLikesServiceImpl implements FilmLikesService {
         log.info("Creating an event - remove like");
         eventService.createEvent(userId, EventType.LIKE, EventOperation.REMOVE, filmId);
         filmStorage.removeLike(filmId, userId);
-        return FilmMapper.mapToFilmDto(filmStorage.getElement(filmId));
+        return filmMapper.mapFilmToDto(filmStorage.getElement(filmId));
     }
 
     @Override
     public List<FilmDto> getPopular(int count) {
         return filmStorage.getTopRatedFilms(count).stream()
-                .map(FilmMapper::mapToFilmDto)
+                .map(film -> filmMapper.mapFilmToDto(film))
                 .toList();
     }
 
     @Override
     public List<FilmDto> getPopularFilmsByGenreAndYear(Integer genreId, Integer year, Integer count) {
         return filmStorage.getPopularFilmsByGenreAndYear(genreId, year, count).stream()
-                .map(FilmMapper::mapToFilmDto).toList();
+                .map(film -> filmMapper.mapFilmToDto(film))
+                .toList();
     }
 
     @Override
     public List<FilmDto> getPopularFilmsByGenre(Integer genreId, Integer count) {
         return filmStorage.getPopularFilmsByGenre(genreId, count).stream()
-                .map(FilmMapper::mapToFilmDto).toList();
+                .map(film -> filmMapper.mapFilmToDto(film)).toList();
     }
 
     @Override
     public List<FilmDto> getPopularFilmsByYear(Integer year, Integer count) {
         return filmStorage.getPopularFilmsByYear(year, count).stream()
-                .map(FilmMapper::mapToFilmDto).toList();
+                .map(film -> filmMapper.mapFilmToDto(film)).toList();
     }
 
     @Override

@@ -21,4 +21,8 @@ public interface DirectorMapper {
     List<DirectorDto> directorListToDto(List<Director> directors);
 
     List<DirectorDto> directorSetToDto(Set<Director> directors);
+
+    Set<DirectorDto> directorSetToSetDto(Set<Director> directors);
+
+    Set<Director> directorDtoSetToSet(Set<DirectorDto> directorDtos);
 }

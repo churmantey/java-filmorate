@@ -37,12 +37,15 @@ public class Film {
     private Rating mpa;
 
     @Getter
-    private final Set<User> likes;
-
-    @Getter
     private final Set<Genre> genres;
 
     private final Set<Director> directors;
+
+    //Конструктор для нового маппера
+    public Film() {
+        this.genres = new LinkedHashSet<>();
+        this.directors = new LinkedHashSet<>();
+    }
 
     public Film(String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
         this.name = name;
@@ -50,7 +53,6 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = new Rating(mpaId);
-        this.likes = new LinkedHashSet<>();
         this.genres = new LinkedHashSet<>();
         this.directors = new LinkedHashSet<>();
     }
@@ -62,7 +64,6 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = new Rating(mpaId);
-        this.likes = new LinkedHashSet<>();
         this.genres = new LinkedHashSet<>();
         this.directors = new LinkedHashSet<>();
     }
@@ -74,7 +75,6 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = null;
-        this.likes = new LinkedHashSet<>();
         this.genres = new LinkedHashSet<>();
         this.directors = new LinkedHashSet<>();
     }

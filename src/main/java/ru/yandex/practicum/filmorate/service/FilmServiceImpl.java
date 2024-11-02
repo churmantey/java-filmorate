@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.*;
 import ru.yandex.practicum.filmorate.dto.mapper.DirectorMapper;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
+import ru.yandex.practicum.filmorate.dto.mapper.FilmNewMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NullObjectException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -30,6 +31,7 @@ public class FilmServiceImpl implements FilmService {
     private final GenreStorage genreStorage;
     private final DirectorService directorService;
     private final DirectorMapper directorMapper;
+    private final FilmNewMapper filmMapper;
 
     @Override
     public FilmDto getFilmById(Integer filmId) {
@@ -49,7 +51,7 @@ public class FilmServiceImpl implements FilmService {
         );
         film.getDirectors().addAll(new LinkedHashSet<>(directors));
 
-        return FilmMapper.mapToFilmDto(film);
+        return filmMapper.mapFilmToDto(film);
     }
 
     @Override
@@ -63,11 +65,11 @@ public class FilmServiceImpl implements FilmService {
         }
         Set<Integer> directorsIds = validateDirectors(newFilmRequest);
 
-        Film film = FilmMapper.mapToFilm(newFilmRequest);
+        Film film = filmMapper.mapRequestToFilm(newFilmRequest);
         Film newFilm = filmStorage.addElement(film);
         directorService.insertFilmAndDirector(newFilm.getId(), directorsIds);
         log.info("Added a new record(s) to films_directors with film id = {} and director id(s) = {} ", newFilm.getId(), directorsIds);
-        return FilmMapper.mapToFilmDto(newFilm);
+        return filmMapper.mapFilmToDto(newFilm);
     }
 
     @Override
@@ -82,13 +84,14 @@ public class FilmServiceImpl implements FilmService {
         }
         Set<Integer> directorsIds = validateDirectors(updateFilmRequest);
 
-        Film film = FilmMapper.mapToFilm(updateFilmRequest);
+        Film film = filmMapper.mapRequestToFilm(updateFilmRequest);
+        log.info("Film for updating {}", film);
         Film oldFilm = filmStorage.getElement(film.getId());
         log.info("Deleting all rows from films_directors with film id = {}", film.getId());
         directorService.deleteFilmsAndDirectors(film.getId());
         log.info("Adding a new record(s) to films_directors with film id = {} and director id(s) = {} ", film.getId(), directorsIds);
         directorService.insertFilmAndDirector(film.getId(), directorsIds);
-        return FilmMapper.mapToFilmDto(
+        return filmMapper.mapFilmToDto(
                 filmStorage.updateElement(film)
         );
     }
@@ -106,7 +109,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<FilmDto> getAllFilms() {
         return filmStorage.getAllElements().stream()
-                .map(FilmMapper::mapToFilmDto)
+                .map(film -> filmMapper.mapFilmToDto(film))
                 .toList();
     }
 
@@ -124,7 +127,7 @@ public class FilmServiceImpl implements FilmService {
         }
 
         return films.stream()
-                .map(FilmMapper::mapToFilmDto)
+                .map(film -> filmMapper.mapFilmToDto(film))
                 .toList();
     }
 
@@ -166,7 +169,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<FilmDto> getCommonFilmsLikesByUsers(Integer userId, Integer friendId) {
         return filmStorage.getFilmsLikesByUsers(userId, friendId).stream()
-                .map(FilmMapper::mapToFilmDto)
+                .map(film -> filmMapper.mapFilmToDto(film))
                 .toList();
     }
 
@@ -175,7 +178,7 @@ public class FilmServiceImpl implements FilmService {
         SearchParams searchParams = new SearchParams(query, criterion);
         return filmStorage.findFilmsBySearchParameters(searchParams).stream()
                 .sorted(Comparator.comparing(film -> film.getMpa().getId()))
-                .map(FilmMapper::mapToFilmDto)
+                .map(film -> filmMapper.mapFilmToDto(film))
                 .toList();
     }
 
