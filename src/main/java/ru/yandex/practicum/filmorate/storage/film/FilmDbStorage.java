@@ -35,7 +35,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String DELETE_QUERY = "DELETE FROM " + tableName + " WHERE id = ?";
 
     private static final String INSERT_LIKES_QUERY = "INSERT INTO film_likes" +
-            " (film_id, user_id) VALUES (?, ?)";
+            " (film_id, user_id, rate) VALUES (?, ?, ?)";
     private static final String REMOVE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
     private static final String FIND_LIKES_QUERY = "SELECT user_id FROM film_likes WHERE film_id = ? ORDER BY user_id";
     private static final String DELETE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ?";
@@ -183,8 +183,8 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
-    public void addLike(Integer filmId, Integer userId) {
-        update(INSERT_LIKES_QUERY, filmId, userId);
+    public void addLike(Integer filmId, Integer userId, Integer rate) {
+        update(INSERT_LIKES_QUERY, filmId, userId, rate);
     }
 
     @Override
