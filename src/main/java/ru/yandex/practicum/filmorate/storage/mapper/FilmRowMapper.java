@@ -20,6 +20,10 @@ public class FilmRowMapper implements RowMapper<Film> {
                 rs.getDate("release_date").toLocalDate(),
                 rs.getInt("duration")
         );
+        try {
+            film.setRate(rs.getDouble("avg_rate"));
+        } catch (Exception ignored) {
+        }
         film.setMpa(new Rating(rs.getInt("rating_id")));
         return film;
     }

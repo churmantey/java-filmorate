@@ -22,11 +22,13 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String tableName = "films";
     private static final String fields = "id, title, description, release_date, duration, rating_id";
     private static final String FIND_ALL_QUERY = "SELECT " + fields + " from " + tableName;
-    private static final String FIND_BY_ID_QUERY = FIND_ALL_QUERY + " WHERE id = ?";
-    private static final String FIND_TOP_RATED_QUERY = "SELECT " + fields + ", AVG(fl.rate) AS count " +
+    private static final String FIND_BY_ID_QUERY = "SELECT f.*, AVG(fl.rate) AS avg_rate FROM film_likes fl " +
+            "RIGHT JOIN films f ON (f.id = fl.film_id) " +
+            "WHERE f.id = ?";
+    private static final String FIND_TOP_RATED_QUERY = "SELECT " + fields + ", AVG(fl.rate) AS avg_rate " +
             "FROM films " +
             "LEFT JOIN film_likes fl ON (id = fl.film_id) " +
-            "GROUP BY " + fields + " ORDER BY count DESC LIMIT ?";
+            "GROUP BY " + fields + " ORDER BY avg_rate DESC LIMIT ?";
     private static final String INSERT_QUERY = "INSERT INTO " + tableName +
             " (title, description, release_date, duration, rating_id) " +
             " VALUES (?, ?, ?, ?, ?)";
@@ -49,61 +51,61 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "GROUP BY f.id " +
             "ORDER BY likes_count DESC";
 
-    private static final String GET_SORTED_FILMS_BY_RATES = "SELECT f.*, AVG(fl.rate) AS likes_count " +
+    private static final String GET_SORTED_FILMS_BY_RATES = "SELECT f.*, AVG(fl.rate) AS avg_rate " +
             "FROM films f " +
             "JOIN FILMS_DIRECTORS fd ON f.id=fd.film_id AND fd.DIRECTOR_ID = ? " +
             "LEFT JOIN film_likes fl ON f.id=fl.film_id " +
             "GROUP BY f.id " +
-            "ORDER BY likes_count DESC";
+            "ORDER BY avg_rate DESC";
 
     private static final String FIND_FILMS_BY_USER_LIKES_QUERY = "SELECT fl.film_id FROM film_likes AS fl " +
-            "JOIN (SELECT film_id, AVG(rate) AS cou FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
-            "WHERE fl.user_id = ? ORDER BY gro.cou DESC";
-    private static final String FIND_TOP_RATED_QUERY_BY_GENRE_AND_YEAR = "SELECT  " + fields + ", AVG(fl.rate) AS countUsers " +
+            "JOIN (SELECT film_id, AVG(rate) AS avg_rate FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
+            "WHERE fl.user_id = ? ORDER BY gro.avg_rate DESC";
+    private static final String FIND_TOP_RATED_QUERY_BY_GENRE_AND_YEAR = "SELECT  " + fields + ", AVG(fl.rate) AS avg_rate " +
             "FROM films AS f " +
             "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
             "WHERE f.id IN (SELECT fg.film_id FROM film_genres AS fg WHERE fg.genre_id = ?) AND EXTRACT(YEAR FROM f.release_date) = ? " +
             "GROUP BY " + fields +
-            " ORDER BY countUsers DESC " +
+            " ORDER BY avg_rate DESC " +
             "LIMIT ?";
-    private static final String FIND_TOP_RATED_QUERY_BY_GENRE = "SELECT " + fields + ", AVG(fl.rate) AS countUsers " +
+    private static final String FIND_TOP_RATED_QUERY_BY_GENRE = "SELECT " + fields + ", AVG(fl.rate) AS avg_rate " +
             "FROM films AS f " +
             "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
             "WHERE f.id IN (SELECT fg.film_id FROM film_genres AS fg WHERE fg.genre_id = ?) " +
             "GROUP BY " + fields +
-            " ORDER BY countUsers DESC " +
+            " ORDER BY avg_rate DESC " +
             "LIMIT ?";
-    private static final String FIND_TOP_RATED_QUERY_BY_YEAR = "SELECT " + fields + ", AVG(fl.rate) AS countUsers " +
+    private static final String FIND_TOP_RATED_QUERY_BY_YEAR = "SELECT " + fields + ", AVG(fl.rate) AS avg_rate " +
             "FROM films AS f " +
             "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
             "WHERE EXTRACT(YEAR FROM f.release_date) = ? " +
             "GROUP BY " + fields +
-            " ORDER BY countUsers DESC " +
+            " ORDER BY avg_rate DESC " +
             "LIMIT ?";
 
-    private static final String FIND_ALL_BY_TITLE_CONTEXT = "SELECT f.*, AVG(fl.rate) AS likes_count " +
+    private static final String FIND_ALL_BY_TITLE_CONTEXT = "SELECT f.*, AVG(fl.rate) AS avg_rate " +
             "FROM film_likes fl " +
             "RIGHT JOIN films f ON fl.film_id = f.id " +
             "WHERE LOWER(f.title) LIKE ? " +
             "GROUP BY f.id " +
-            "ORDER BY likes_count DESC";
-    private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT f.*, AVG(fl.rate) AS likes_count " +
+            "ORDER BY avg_rate DESC";
+    private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT f.*, AVG(fl.rate) AS avg_rate " +
             "FROM film_likes fl " +
             "RIGHT JOIN films f ON fl.film_id = f.id " +
             "WHERE f.id IN " +
             "(SELECT fd.film_id FROM films_directors AS fd " +
             "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
             "GROUP BY f.id " +
-            "ORDER BY likes_count DESC";
+            "ORDER BY avg_rate DESC";
     private static final String FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT =
-            "SELECT f.*, AVG(fl.rate) AS likes_count " +
+            "SELECT f.*, AVG(fl.rate) AS avg_rate " +
                     "FROM film_likes fl " +
                     "RIGHT JOIN films f ON fl.film_id = f.id " +
                     "WHERE (LOWER(f.title) LIKE ?) OR " +
                     "f.id IN (SELECT fd.film_id FROM films_directors AS fd " +
                     "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
                     "GROUP BY f.id " +
-                    "ORDER BY likes_count DESC";
+                    "ORDER BY avg_rate DESC";
 
     private static final String FIND_RECOMMENDED_FOR_USER_QUERY = "SELECT " + fields + " FROM " + tableName + " " +
             """
