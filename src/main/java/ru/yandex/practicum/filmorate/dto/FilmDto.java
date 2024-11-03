@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,9 @@ public class FilmDto {
     private IdEntity mpa;
     private final Set<IdEntity> genres;
     private final Set<DirectorDto> directors;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Double rate;
 
     public FilmDto() {
         this.genres = new LinkedHashSet<>();

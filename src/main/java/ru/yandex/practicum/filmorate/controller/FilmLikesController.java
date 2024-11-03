@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.service.FilmLikesService;
@@ -17,12 +19,16 @@ public class FilmLikesController {
     private final FilmLikesService filmLikesService;
 
     //PUT /films/{id}/like/{userId}
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping({"/{id}/like/{userId}", "/{id}/like/{userId}/{rate}"})
     public FilmDto addLike(@PathVariable Integer id,
-                           @PathVariable Integer userId) {
-        log.info("PUT add like film {} , user {}", id, userId);
-        FilmDto filmDto = filmLikesService.addLike(id, userId);
-        log.info("К film {} добавлен лайк user {}", id, userId);
+                           @PathVariable Integer userId,
+                           @Valid @PathVariable(required = false) @Range(min = 1, max = 10) Double rate) {
+        if (rate == null) {
+            rate = 6.0;
+        }
+        log.info("PUT add like film {} , user {}, rate {}", id, userId, rate);
+        FilmDto filmDto = filmLikesService.addLike(id, userId, rate);
+        log.info("К film {} добавлен лайк user {}, rate {}", id, userId, rate);
         return filmDto;
     }
 

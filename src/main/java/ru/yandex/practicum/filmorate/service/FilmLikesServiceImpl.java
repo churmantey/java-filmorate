@@ -25,12 +25,12 @@ public class FilmLikesServiceImpl implements FilmLikesService {
     private final EventService eventService;
 
     @Override
-    public FilmDto addLike(Integer filmId, Integer userId) {
+    public FilmDto addLike(Integer filmId, Integer userId, Double rate) {
         Film film = filmStorage.getElement(filmId);
         User user = userStorage.getElement(userId);
         log.info("Creating an event - adding like");
         eventService.createEvent(userId, EventType.LIKE, EventOperation.ADD, filmId);
-        filmStorage.addLike(filmId, userId);
+        filmStorage.addLike(filmId, userId, rate);
         return FilmMapper.mapToFilmDto(filmStorage.getElement(filmId));
     }
 

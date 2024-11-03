@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.Transient;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -43,6 +44,9 @@ public class Film {
     private final Set<Genre> genres;
 
     private final Set<Director> directors;
+
+    @Transient
+    private Double rate;
 
     public Film(String name, String description, LocalDate releaseDate, Integer duration, Integer mpaId) {
         this.name = name;

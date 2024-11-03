@@ -10,7 +10,7 @@ public interface FilmStorage extends BaseStorage<Film> {
 
     List<Film> getTopRatedFilms(int count);
 
-    void addLike(Integer filmId, Integer userId);
+    void addLike(Integer filmId, Integer userId, Double rate);
 
     void removeLike(Integer filmId, Integer userId);
 
@@ -31,5 +31,7 @@ public interface FilmStorage extends BaseStorage<Film> {
     List<Film> getPopularFilmsByYear(Integer year, Integer count);
 
     List<Film> getRecommendedFilms(Integer userId);
+
+    List<Film> getSortedFilmsByRates(Integer id);
 
 }

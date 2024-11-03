@@ -22,11 +22,17 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String tableName = "films";
     private static final String fields = "id, title, description, release_date, duration, rating_id";
     private static final String FIND_ALL_QUERY = "SELECT " + fields + " from " + tableName;
-    private static final String FIND_BY_ID_QUERY = FIND_ALL_QUERY + " WHERE id = ?";
-    private static final String FIND_TOP_RATED_QUERY = "SELECT " + fields + ", COUNT(fl.user_id) AS count " +
+    private static final String FIND_BY_ID_QUERY = "SELECT " + fields + ", AVG(fl.rate) AS avg_rate " +
+            "FROM " + tableName + " " + """
+            LEFT JOIN film_likes fl ON (id = fl.film_id)
+            WHERE id = ?
+            GROUP BY
+            """ + fields;
+
+    private static final String FIND_TOP_RATED_QUERY = "SELECT " + fields + ", AVG(fl.rate) AS avg_rate " +
             "FROM films " +
             "LEFT JOIN film_likes fl ON (id = fl.film_id) " +
-            "GROUP BY " + fields + " ORDER BY count DESC LIMIT ?";
+            "GROUP BY " + fields + " ORDER BY avg_rate DESC LIMIT ?";
     private static final String INSERT_QUERY = "INSERT INTO " + tableName +
             " (title, description, release_date, duration, rating_id) " +
             " VALUES (?, ?, ?, ?, ?)";
@@ -35,68 +41,75 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String DELETE_QUERY = "DELETE FROM " + tableName + " WHERE id = ?";
 
     private static final String INSERT_LIKES_QUERY = "INSERT INTO film_likes" +
-            " (film_id, user_id) VALUES (?, ?)";
+            " (film_id, user_id, rate) VALUES (?, ?, ?)";
     private static final String REMOVE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
     private static final String FIND_LIKES_QUERY = "SELECT user_id FROM film_likes WHERE film_id = ? ORDER BY user_id";
     private static final String DELETE_LIKES_QUERY = "DELETE FROM film_likes WHERE film_id = ?";
     private static final String GET_SORTED_FILMS_BY_YEAR = "SELECT * FROM FILMS f " +
             "WHERE id IN (SELECT film_id FROM FILMS_DIRECTORS fd WHERE director_id = ?) " +
             "ORDER BY EXTRACT (YEAR FROM release_date);";
-    private static final String GET_SORTED_FILMS_BY_LIKES = "SELECT f.*, COUNT(fl.film_id) AS likes_count " +
+    private static final String GET_SORTED_FILMS_BY_LIKES = "SELECT f.*, COUNT(fl.rate) AS likes_count " +
             "FROM films f " +
             "JOIN FILMS_DIRECTORS fd ON f.id=fd.film_id AND fd.DIRECTOR_ID = ? " +
             "LEFT JOIN film_likes fl ON f.id=fl.film_id " +
             "GROUP BY f.id " +
             "ORDER BY likes_count DESC";
 
+    private static final String GET_SORTED_FILMS_BY_RATES = "SELECT f.*, AVG(fl.rate) AS avg_rate " +
+            "FROM films f " +
+            "JOIN FILMS_DIRECTORS fd ON f.id=fd.film_id AND fd.DIRECTOR_ID = ? " +
+            "LEFT JOIN film_likes fl ON f.id=fl.film_id " +
+            "GROUP BY f.id " +
+            "ORDER BY avg_rate DESC";
+
     private static final String FIND_FILMS_BY_USER_LIKES_QUERY = "SELECT fl.film_id FROM film_likes AS fl " +
-            "JOIN (SELECT film_id, COUNT(user_id) AS cou FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
-            "WHERE fl.user_id = ? ORDER BY gro.cou DESC";
-    private static final String FIND_TOP_RATED_QUERY_BY_GENRE_AND_YEAR = "SELECT  " + fields + ", COUNT(fl.user_id) AS countUsers " +
+            "JOIN (SELECT film_id, AVG(rate) AS avg_rate FROM film_likes GROUP BY film_id) AS gro ON fl.film_id = gro.film_id " +
+            "WHERE fl.user_id = ? ORDER BY gro.avg_rate DESC";
+    private static final String FIND_TOP_RATED_QUERY_BY_GENRE_AND_YEAR = "SELECT  " + fields + ", AVG(fl.rate) AS avg_rate " +
             "FROM films AS f " +
             "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
             "WHERE f.id IN (SELECT fg.film_id FROM film_genres AS fg WHERE fg.genre_id = ?) AND EXTRACT(YEAR FROM f.release_date) = ? " +
             "GROUP BY " + fields +
-            " ORDER BY countUsers DESC " +
+            " ORDER BY avg_rate DESC " +
             "LIMIT ?";
-    private static final String FIND_TOP_RATED_QUERY_BY_GENRE = "SELECT " + fields + ", COUNT(fl.user_id) AS countUsers " +
+    private static final String FIND_TOP_RATED_QUERY_BY_GENRE = "SELECT " + fields + ", AVG(fl.rate) AS avg_rate " +
             "FROM films AS f " +
             "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
             "WHERE f.id IN (SELECT fg.film_id FROM film_genres AS fg WHERE fg.genre_id = ?) " +
             "GROUP BY " + fields +
-            " ORDER BY countUsers DESC " +
+            " ORDER BY avg_rate DESC " +
             "LIMIT ?";
-    private static final String FIND_TOP_RATED_QUERY_BY_YEAR = "SELECT " + fields + ", COUNT(fl.user_id) AS countUsers " +
+    private static final String FIND_TOP_RATED_QUERY_BY_YEAR = "SELECT " + fields + ", AVG(fl.rate) AS avg_rate " +
             "FROM films AS f " +
             "LEFT JOIN film_likes AS fl ON (fl.film_id=f.id) " +
             "WHERE EXTRACT(YEAR FROM f.release_date) = ? " +
             "GROUP BY " + fields +
-            " ORDER BY countUsers DESC " +
+            " ORDER BY avg_rate DESC " +
             "LIMIT ?";
 
-    private static final String FIND_ALL_BY_TITLE_CONTEXT = "SELECT f.*, COUNT(fl.user_id) AS likes_count " +
+    private static final String FIND_ALL_BY_TITLE_CONTEXT = "SELECT f.*, AVG(fl.rate) AS avg_rate " +
             "FROM film_likes fl " +
             "RIGHT JOIN films f ON fl.film_id = f.id " +
             "WHERE LOWER(f.title) LIKE ? " +
             "GROUP BY f.id " +
-            "ORDER BY likes_count DESC";
-    private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT f.*, COUNT(fl.user_id) AS likes_count " +
+            "ORDER BY avg_rate DESC, f.id";
+    private static final String FIND_ALL_BY_DIRECTOR_CONTEXT = "SELECT f.*, AVG(fl.rate) AS avg_rate " +
             "FROM film_likes fl " +
             "RIGHT JOIN films f ON fl.film_id = f.id " +
             "WHERE f.id IN " +
             "(SELECT fd.film_id FROM films_directors AS fd " +
             "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
             "GROUP BY f.id " +
-            "ORDER BY likes_count DESC";
+            "ORDER BY avg_rate DESC, f.id";
     private static final String FIND_ALL_BY_TITLE_AND_DIRECTOR_CONTEXT =
-            "SELECT f.*, COUNT(fl.user_id) AS likes_count " +
+            "SELECT f.*, AVG(fl.rate) AS avg_rate " +
                     "FROM film_likes fl " +
                     "RIGHT JOIN films f ON fl.film_id = f.id " +
                     "WHERE (LOWER(f.title) LIKE ?) OR " +
                     "f.id IN (SELECT fd.film_id FROM films_directors AS fd " +
                     "WHERE fd.director_id IN (SELECT d.id FROM directors AS d WHERE LOWER(d.name) LIKE ?)) " +
                     "GROUP BY f.id " +
-                    "ORDER BY likes_count DESC";
+                    "ORDER BY avg_rate DESC, f.id";
 
     private static final String FIND_RECOMMENDED_FOR_USER_QUERY = "SELECT " + fields + " FROM " + tableName + " " +
             """
@@ -105,13 +118,42 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                     SELECT user_id
                     FROM film_likes WHERE film_id IN (
                     	SELECT fl.film_id
-                    	FROM film_likes fl WHERE user_id = ?) AND USER_ID <> ?
+                    	FROM film_likes fl WHERE user_id = ? AND rate > 5) AND USER_ID <> ?
                     GROUP BY user_id
                     ORDER BY count(FILM_ID) DESC
-                    LIMIT 1)
+                    LIMIT 1) AND fl.rate > 5
                     AND fl.film_id NOT IN(
                     	SELECT fl.film_id
                     	FROM film_likes fl WHERE user_id = ?)
+                    ORDER BY fl.rate DESC
+                    """;
+
+    private static final String FIND_RECOMMENDED_FOR_USER_BY_RATES_QUERY = "SELECT " + fields +
+            " FROM " + tableName + " " +
+            """
+                    INNER JOIN film_likes fl ON (id = fl.FILM_ID)
+                    AND fl.rate > 5
+                    AND fl.USER_ID IN (
+                            SELECT fl.user_id
+                            FROM FILM_LIKES fl
+                            INNER JOIN (
+                            SELECT fl.film_id AS film_id,
+                                                    (fl.RATE > 5) AS is_positive_rate
+                    FROM FILM_LIKES fl WHERE fl.USER_ID = ?
+                            ) AS user_data
+                    ON (
+                            FL.FILM_ID = user_data.film_id
+                            AND ((fl.RATE > 5) = user_data.is_positive_rate)
+                    AND fl.USER_ID <> ?
+                            )
+                    GROUP BY fl.USER_ID
+                    ORDER BY COUNT(fl.film_id) DESC
+                    LIMIT 1
+                            )
+                    AND fl.film_id NOT IN (
+                            SELECT fl.film_id
+                            FROM FILM_LIKES fl WHERE fl.USER_ID = ?
+                    )
                     """;
 
     private final GenreStorage genreStorage;
@@ -183,8 +225,8 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
-    public void addLike(Integer filmId, Integer userId) {
-        update(INSERT_LIKES_QUERY, filmId, userId);
+    public void addLike(Integer filmId, Integer userId, Double rate) {
+        update(INSERT_LIKES_QUERY, filmId, userId, rate);
     }
 
     @Override
@@ -221,6 +263,13 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public List<Film> getSortedFilmsByLikes(Integer id) {
         List<Film> films = findMany(GET_SORTED_FILMS_BY_LIKES, id);
+        films.forEach(this::setFilmMpaGenresDirectors);
+        return films;
+    }
+
+    @Override
+    public List<Film> getSortedFilmsByRates(Integer id) {
+        List<Film> films = findMany(GET_SORTED_FILMS_BY_RATES, id);
         films.forEach(this::setFilmMpaGenresDirectors);
         return films;
     }
@@ -289,7 +338,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public List<Film> getRecommendedFilms(Integer userId) {
-        List<Film> films = findMany(FIND_RECOMMENDED_FOR_USER_QUERY, userId, userId, userId);
+        List<Film> films = findMany(FIND_RECOMMENDED_FOR_USER_BY_RATES_QUERY, userId, userId, userId);
         films.forEach(this::setFilmMpaGenresDirectors);
         return films;
     }

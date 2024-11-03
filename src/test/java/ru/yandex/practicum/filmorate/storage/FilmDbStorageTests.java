@@ -100,7 +100,7 @@ public class FilmDbStorageTests {
     public void testAddLike() {
         film = filmStorage.addElement(film);
         assertThat(filmStorage.getFilmLikes(film.getId())).hasSize(0);
-        filmStorage.addLike(film.getId(), 1);
+        filmStorage.addLike(film.getId(), 1, 6.0);
         assertThat(filmStorage.getFilmLikes(film.getId())).hasSize(1);
     }
 
