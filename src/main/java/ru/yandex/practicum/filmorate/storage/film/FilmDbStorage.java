@@ -105,13 +105,14 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                     SELECT user_id
                     FROM film_likes WHERE film_id IN (
                     	SELECT fl.film_id
-                    	FROM film_likes fl WHERE user_id = ? AND rate > 5) AND USER_ID <> ? AND rate > 5
+                    	FROM film_likes fl WHERE user_id = ? AND rate > 5) AND USER_ID <> ?
                     GROUP BY user_id
                     ORDER BY count(FILM_ID) DESC
-                    LIMIT 1)
+                    LIMIT 1) AND fl.rate > 5
                     AND fl.film_id NOT IN(
                     	SELECT fl.film_id
                     	FROM film_likes fl WHERE user_id = ?)
+                    ORDER BY fl.rate DESC
                     """;
 
     private final GenreStorage genreStorage;
