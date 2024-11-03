@@ -25,7 +25,7 @@ public class FilmLikesServiceImpl implements FilmLikesService {
     private final EventService eventService;
 
     @Override
-    public FilmDto addLike(Integer filmId, Integer userId, Integer rate) {
+    public FilmDto addLike(Integer filmId, Integer userId, Double rate) {
         Film film = filmStorage.getElement(filmId);
         User user = userStorage.getElement(userId);
         log.info("Creating an event - adding like");

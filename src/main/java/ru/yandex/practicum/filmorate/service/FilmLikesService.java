@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface FilmLikesService {
 
-    FilmDto addLike(Integer filmId, Integer userId, Integer rate);
+    FilmDto addLike(Integer filmId, Integer userId, Double rate);
 
     FilmDto removeLike(Integer filmId, Integer userId);
 

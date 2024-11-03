@@ -22,9 +22,9 @@ public class FilmLikesController {
     @PutMapping({"/{id}/like/{userId}", "/{id}/like/{userId}/{rate}"})
     public FilmDto addLike(@PathVariable Integer id,
                            @PathVariable Integer userId,
-                           @Valid @PathVariable(required = false) @Range(min = 1, max = 10) Integer rate) {
+                           @Valid @PathVariable(required = false) @Range(min = 1, max = 10) Double rate) {
         if (rate == null) {
-            rate = 6;
+            rate = 6.0;
         }
         log.info("PUT add like film {} , user {}, rate {}", id, userId, rate);
         FilmDto filmDto = filmLikesService.addLike(id, userId, rate);
