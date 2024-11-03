@@ -32,4 +32,6 @@ public interface FilmStorage extends BaseStorage<Film> {
 
     List<Film> getRecommendedFilms(Integer userId);
 
+    List<Film> getSortedFilmsByRates(Integer id);
+
 }

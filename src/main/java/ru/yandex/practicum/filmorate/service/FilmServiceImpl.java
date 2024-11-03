@@ -119,6 +119,8 @@ public class FilmServiceImpl implements FilmService {
             films = filmStorage.getSortedFilmsByYear(directorId);
         } else if (sort.equalsIgnoreCase("likes")) {
             films = filmStorage.getSortedFilmsByLikes(directorId);
+        } else if (sort.equalsIgnoreCase("rate")) {
+            films = filmStorage.getSortedFilmsByRates(directorId);
         } else {
             throw new ValidationException("Invalid sort filter entered");
         }

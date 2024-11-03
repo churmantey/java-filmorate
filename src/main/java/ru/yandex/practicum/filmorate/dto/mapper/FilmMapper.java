@@ -50,6 +50,7 @@ public final class FilmMapper {
         filmDto.setDescription(film.getDescription());
         filmDto.setReleaseDate(film.getReleaseDate());
         filmDto.setDuration(film.getDuration());
+        filmDto.setRate(film.getRate());
         if (film.getMpa() != null) {
             filmDto.setMpa(new IdEntity(film.getMpa().getId(), film.getMpa().getName()));
         }

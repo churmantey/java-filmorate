@@ -42,7 +42,14 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String GET_SORTED_FILMS_BY_YEAR = "SELECT * FROM FILMS f " +
             "WHERE id IN (SELECT film_id FROM FILMS_DIRECTORS fd WHERE director_id = ?) " +
             "ORDER BY EXTRACT (YEAR FROM release_date);";
-    private static final String GET_SORTED_FILMS_BY_LIKES = "SELECT f.*, AVG(fl.rate) AS likes_count " +
+    private static final String GET_SORTED_FILMS_BY_LIKES = "SELECT f.*, COUNT(fl.rate) AS likes_count " +
+            "FROM films f " +
+            "JOIN FILMS_DIRECTORS fd ON f.id=fd.film_id AND fd.DIRECTOR_ID = ? " +
+            "LEFT JOIN film_likes fl ON f.id=fl.film_id " +
+            "GROUP BY f.id " +
+            "ORDER BY likes_count DESC";
+
+    private static final String GET_SORTED_FILMS_BY_RATES = "SELECT f.*, AVG(fl.rate) AS likes_count " +
             "FROM films f " +
             "JOIN FILMS_DIRECTORS fd ON f.id=fd.film_id AND fd.DIRECTOR_ID = ? " +
             "LEFT JOIN film_likes fl ON f.id=fl.film_id " +
@@ -222,6 +229,13 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public List<Film> getSortedFilmsByLikes(Integer id) {
         List<Film> films = findMany(GET_SORTED_FILMS_BY_LIKES, id);
+        films.forEach(this::setFilmMpaGenresDirectors);
+        return films;
+    }
+
+    @Override
+    public List<Film> getSortedFilmsByRates(Integer id) {
+        List<Film> films = findMany(GET_SORTED_FILMS_BY_RATES, id);
         films.forEach(this::setFilmMpaGenresDirectors);
         return films;
     }
